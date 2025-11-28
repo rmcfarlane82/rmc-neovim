@@ -40,3 +40,12 @@ vim.api.nvim_create_autocmd({ "VimEnter", "ColorScheme" }, { callback = set_term
 vim.api.nvim_create_autocmd("TermOpen", { callback = set_term_colors })
 
 set_term_colors()
+
+--vim.api.nvim_create_autocmd("BufDelete", {
+--  callback = function()
+--    local bufs = vim.t.bufs
+--    if #bufs == 1 and vim.api.nvim_buf_get_name(bufs[1]) == "" then
+--      vim.cmd "Nvdash"
+--    end
+--  end,
+--})

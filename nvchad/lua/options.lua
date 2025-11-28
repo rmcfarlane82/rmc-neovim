@@ -11,4 +11,3 @@ o.softtabstop = 4
 o.smartindent = true
 o.wrap = false
 
-

@@ -1,6 +1,7 @@
 return {
   {
     "nvim-telescope/telescope.nvim",
+    event = "VeryLazy",
     opts = function(_, opts)
       opts = opts or {}
       opts.defaults = vim.tbl_deep_extend("force", opts.defaults or {}, {

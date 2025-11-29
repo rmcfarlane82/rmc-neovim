@@ -4,8 +4,14 @@ local options = {
     markdown = { "prettier" },
     md = { "prettier" },
     mdx = { "prettier" },
-    -- css = { "prettier" },
-    -- html = { "prettier" },
+    javascript = { "prettier" },
+    javascriptreact = { "prettier" },
+    typescript = { "prettier" },
+    typescriptreact = { "prettier" },
+    json = { "prettier" },
+    jsonc = { "prettier" },
+    html = { "prettier" },
+    css = { "prettier" },
   },
 
   -- format_on_save = {

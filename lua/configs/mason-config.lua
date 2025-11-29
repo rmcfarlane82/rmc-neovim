@@ -21,6 +21,7 @@ mason.setup({
       "css-lsp",
       "eslint-lsp",
       "typescript-language-server",
+      "emmet-language-server",
       "json-lsp",
       "rust-analyzer",
       "marksman",

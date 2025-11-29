@@ -178,6 +178,51 @@ map("n", "<leader>cd", function()
 end, { desc = "dotnet: debug project" })
 
 ---------------------------------------------------------------------------
+-- JavaScript / TypeScript Utilities
+---------------------------------------------------------------------------
+local function tsserver_attached(bufnr)
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
+  for _, client in ipairs(vim.lsp.get_active_clients { bufnr = bufnr }) do
+    if client.name == "tsserver" then
+      return true
+    end
+  end
+  return false
+end
+
+local function tsserver_exec(command)
+  if not tsserver_attached() then
+    vim.notify("TypeScript server is not attached to this buffer", vim.log.levels.WARN, { title = "TypeScript" })
+    return
+  end
+
+  vim.lsp.buf.execute_command {
+    command = command,
+    arguments = { vim.api.nvim_buf_get_name(0) },
+  }
+end
+
+map("n", "<leader>co", function()
+  tsserver_exec "_typescript.organizeImports"
+end, { desc = "TS: Organize imports" })
+
+map("n", "<leader>cu", function()
+  tsserver_exec "_typescript.removeUnused"
+end, { desc = "TS: Remove unused" })
+
+map("n", "<leader>cF", function()
+  tsserver_exec "_typescript.applyFixAll"
+end, { desc = "TS: Apply fix all" })
+
+map("n", "<leader>ce", function()
+  if vim.fn.exists ":EslintFixAll" == 2 then
+    vim.cmd "EslintFixAll"
+  else
+    vim.notify("EslintFixAll command is not available", vim.log.levels.WARN, { title = "ESLint" })
+  end
+end, { desc = "ESLint: Fix file" })
+
+---------------------------------------------------------------------------
 -- Debugging (DAP) — For project / application debugging
 ---------------------------------------------------------------------------
 local dap = require "dap"

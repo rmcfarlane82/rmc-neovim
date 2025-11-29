@@ -7,6 +7,11 @@ return  {
         "vimdoc",
         "html",
         "css",
+        "javascript",
+        "typescript",
+        "tsx",
+        "json",
+        "jsonc",
         "markdown",
         "markdown_inline",
 
@@ -15,4 +20,3 @@ return  {
       },
     },
   }
-

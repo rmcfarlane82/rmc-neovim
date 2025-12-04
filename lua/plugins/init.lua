@@ -34,5 +34,9 @@ return {
 
   -- test new blink
   { import = "nvchad.blink.lazyspec" },
+{
+  "WhoIsSethDaniel/mason-tool-installer.nvim",
+  dependencies = { "williamboman/mason.nvim" },
+},
 
 }

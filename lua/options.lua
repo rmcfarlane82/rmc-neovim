@@ -22,3 +22,8 @@ o.wrap = false
 --  "o:hor50-Cursor", -- operator-pending
 --  "sm:block-blinkwait175-blinkoff150-blinkon175-Cursor", -- showmatch
 --}, ",")
+--o.equalalways = true
+--o.eadirection = "both"
+o.winminwidth=10
+o.winminheight=0
+o.splitkeep="screen"

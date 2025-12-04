@@ -50,3 +50,4 @@ end)
   },
 })
 
+require("custom.neotree-width")

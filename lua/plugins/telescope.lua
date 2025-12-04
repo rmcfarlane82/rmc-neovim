@@ -8,7 +8,7 @@ return {
       opts.defaults = vim.tbl_deep_extend("force", opts.defaults or {}, {
         sorting_strategy = "ascending",
         layout_config = { prompt_position = "top" },
-        initial_mode = "normal",
+        --initial_mode = "normal",
         file_ignore_patterns = {
           "obj[\\/]",
           "bin[\\/]",

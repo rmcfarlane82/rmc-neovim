@@ -160,6 +160,9 @@ local function apply()
 		NeoTreeCsharpProjectIcon               = { fg = PGREEN },
 		NeoTreeSolutionIcon                    = { fg = PURPLE },
 
+		-- LazyGit (Snacks)
+		LazyGitActiveBorder                    = { fg = TEAL },
+
 		-- Popup menu
 		Pmenu                                  = { fg = OFFWHITE, bg = BASE },
 		PmenuSel                               = { fg = BASE, bg = BLUE, bold = true },

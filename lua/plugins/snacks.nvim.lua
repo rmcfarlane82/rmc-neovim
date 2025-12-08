@@ -47,6 +47,22 @@ return {
 		bufdelete = { enabled = true },
 		zen = { enabled = true },
 		dim = { enabled = true },
+		gitbrowse = { enabled = true },
+		lazygit = {
+
+			theme = {
+				[241]                      = { fg = "Special" },
+				activeBorderColor          = { fg = "LazyGitActiveBorder", bold = true },
+				cherryPickedCommitBgColor  = { fg = "Identifier" },
+				cherryPickedCommitFgColor  = { fg = "Function" },
+				defaultFgColor             = { fg = "Normal" },
+				inactiveBorderColor        = { fg = "FloatBorder" },
+				optionsTextColor           = { fg = "Function" },
+				searchingActiveBorderColor = { fg = "MatchParen", bold = true },
+				selectedLineBgColor        = { bg = "Visual" }, -- set to `default` to have no background colour
+				unstagedChangesColor       = { fg = "DiagnosticError" },
+			},
+		},
 	},
 	keys = {
 		{
@@ -162,12 +178,14 @@ return {
 			end,
 			desc = "Log File"
 		},
+		{ "<leader>ga", function() Snacks.lazygit() end,                          desc = "Lazy Git" },
 
 		-- Github
 		{ "<leader>gi", function() Snacks.picker.gh_issue() end,                  desc = "Issues (open)" },
 		{ "<leader>gI", function() Snacks.picker.gh_issue({ state = "all" }) end, desc = "Issues (all)" },
 		{ "<leader>gp", function() Snacks.picker.gh_pr() end,                     desc = "Pull Requests (open)" },
 		{ "<leader>gP", function() Snacks.picker.gh_pr({ state = "all" }) end,    desc = "Pull Requests (all)" },
+		{ "<leader>gB", function() Snacks.gitbrowse.open() end,                   desc = "Browser" },
 
 
 
@@ -212,6 +230,7 @@ return {
 		{ "<leader>fh", function() Snacks.picker.command_history() end,       desc = "Command History" },
 		{ "<leader>fn", function() Snacks.picker.notifications() end,         desc = "Notification History" },
 		{ "<leader>e",  function() Snacks.explorer() end,                     desc = "File Explorer" },
+		{ "<C-e>",      function() Snacks.explorer() end,                     desc = "File Explorer" },
 		{ "<leader>fp", function() Snacks.picker.projects() end,              desc = "Projects" },
 
 		{ "<leader>bd", function() Snacks.bufdelete() end,                    desc = "Delete current buffer" },
@@ -230,5 +249,8 @@ return {
 		{ "<leader>lD", function() Snacks.picker.diagnostics_buffer() end,    desc = "Buffer Diagnostics" },
 		{ "<Space>.",   function() vim.lsp.buf.code_action() end,             desc = "Code action" },
 		{ "<leader>lf", function() vim.lsp.buf.format({ async = true }) end,  desc = "Format file" },
+
+		{ "]]",         function() Snacks.words.jump(1, true) end,            desc = "Next Reference" },
+		{ "[[",         function() Snacks.words.jump(-1, true) end,           desc = "Previous Reference" },
 	},
 }

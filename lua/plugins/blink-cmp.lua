@@ -7,7 +7,7 @@ return {
 			preset = "none",
 			["<C-n>"] = { 'select_next', 'fallback' },
 			["<C-p>"] = { "select_prev", "fallback" },
-			["<Enter>"] = { "accept", "fallback" },
+			["<CR>"] = { "accept", "fallback" },
 		},
 		snippets = {
 			preset = "default",

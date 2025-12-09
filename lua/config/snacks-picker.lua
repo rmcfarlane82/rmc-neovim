@@ -15,7 +15,6 @@ return {
 			git_status_hl = false, -- keep folder/file colors stable; git signs still show
 		},
 	},
-
 	win = {
 		input = {
 			keys = {
@@ -25,7 +24,6 @@ return {
 			},
 		},
 	},
-
 	layouts = {
 		vertical = {
 			config = function(layout)

@@ -18,6 +18,9 @@ opt.wrap = false
 opt.cmdheight = 0
 opt.ignorecase = true -- make searches (and flash.nvim) case-insensitive
 opt.smartcase = true -- keep capitals meaningful when searching
+opt.autoread = true
+
+vim.cmd [[autocmd FocusGained,BufEnter * checktime]]
 
 local indent_group = vim.api.nvim_create_augroup("CustomIndent", { clear = true })
 

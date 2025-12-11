@@ -2,6 +2,8 @@ local Snacks = require("snacks")
 local scroll = require("config.snacks-scroll")
 local statuscolumn = require("config.snacks-statuscolumn")
 local picker = require("config.snacks-picker")
+local user_secrets = require("config.user_secrets")
+local buffer_sidebar_width = 50
 
 local function toggle_terminal(position, opts)
 	opts = opts or {}
@@ -248,16 +250,23 @@ return {
 			desc = "Smart Find Files"
 		},
 		{
-			"<leader>fb",
+			"<C-b>",
 			function()
 				Snacks.picker.buffers({
 					-- Focus the list so we don't auto-enter insert mode
 					on_show = function()
 						vim.cmd.stopinsert()
 					end,
-					layout = "sidebar",
-					finder = "buffers",
-					format = "buffer",
+					layout = {
+						preset = "sidebar",
+						layout = {
+							preview = "main",
+							position = "right",
+							width = buffer_sidebar_width,
+							min_width = buffer_sidebar_width,
+							max_width = buffer_sidebar_width,
+						},
+					},
 					hidden = false,
 					unloaded = true,
 					current = true,
@@ -278,6 +287,7 @@ return {
 		{ "<leader>fg", function() Snacks.picker.grep() end,            desc = "Grep" },
 		{ "<leader>fh", function() Snacks.picker.command_history() end, desc = "Command History" },
 		{ "<leader>fn", function() Snacks.picker.notifications() end,   desc = "Notification History" },
+		{ "<leader>fu", function() user_secrets.open_picker() end,      desc = "User Secrets" },
 		{
 			"<leader>e",
 			function()

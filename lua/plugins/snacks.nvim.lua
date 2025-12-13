@@ -69,6 +69,11 @@ return {
 		dim = { enabled = true },
 		gitbrowse = { enabled = true },
 		lazygit = {
+			-- Close the terminal buffer when lazygit exits to avoid lingering "process exited" messages
+			auto_close = true,
+			interactive = false,
+			start_insert = false,
+			auto_insert = false,
 			theme = {
 				[241]                      = { fg = "Special" },
 				activeBorderColor          = { fg = "LazyGitActiveBorder", bold = true },

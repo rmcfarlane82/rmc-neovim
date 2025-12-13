@@ -71,9 +71,9 @@ return {
 		lazygit = {
 			-- Close the terminal buffer when lazygit exits to avoid lingering "process exited" messages
 			auto_close = true,
-			interactive = false,
-			start_insert = false,
-			auto_insert = false,
+			interactive = true, -- enter insert for lazygit, even though other terminals default to normal
+			start_insert = true,
+			auto_insert = true,
 			theme = {
 				[241]                      = { fg = "Special" },
 				activeBorderColor          = { fg = "LazyGitActiveBorder", bold = true },

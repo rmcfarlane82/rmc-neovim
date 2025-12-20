@@ -1,0 +1,8 @@
+.DS_Store
+.cache/
+.netrwhist
+.nvimlog
+.luarc.json
+.luarc.jsonc
+Session.vim
+Session*.vim

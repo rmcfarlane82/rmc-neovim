@@ -72,8 +72,16 @@ Picker keys (terminal picker):
 
 ## Screenshots
 
+### Home Screen
+
 ![Home Screen](screenshots/home-screen.png)
+
+### C# Editing
+
 ![C#](screenshots/c-sharp.png)
+
+### Buffers with Snacks.Nvim (great package)
+
 ![Buffers](screenshots/buffers.png)
 
 ## Notes

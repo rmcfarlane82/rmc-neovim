@@ -98,5 +98,8 @@ vim.keymap.set("n", "<leader>df", function()
 
 vim.keymap.set("n", "<leader>dP", function() require("dotnet_tests").pick_project_and_run_tests() end, { desc = "Pick .NET test project" })
 
+vim.keymap.set("n", "<leader>de", function()
+    require("dotnet_tests").open_test_explorer()
+  end, { desc = "Open Dotnet Test Explorer" })
 
 

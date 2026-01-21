@@ -196,13 +196,65 @@ local function find_csproj(start_dir)
   return matches[1]
 end
 
--- Stream stdout/stderr to notifications as lines arrive.
-local function stream_output(level, data)
-  if not data or data == "" then
-    return
+local function ensure_results_buf()
+  local name = "Dotnet Test Results"
+  local existing = vim.fn.bufnr(name)
+  if existing > 0 then
+    return existing
   end
-  for _, line in ipairs(vim.split(data, "\n", { trimempty = true })) do
-    notify(level, line)
+
+  local buf = vim.api.nvim_create_buf(false, true)
+  vim.api.nvim_buf_set_name(buf, name)
+  vim.bo[buf].buflisted = false
+  vim.bo[buf].buftype = "nofile"
+  vim.bo[buf].swapfile = false
+  vim.bo[buf].filetype = "dotnettest"
+  return buf
+end
+
+local function open_results_split(bufnr)
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    if vim.api.nvim_win_get_buf(win) == bufnr then
+      vim.api.nvim_set_current_win(win)
+      vim.api.nvim_win_set_height(win, 15)
+      return
+    end
+  end
+
+  vim.cmd("botright 15split")
+  vim.api.nvim_win_set_buf(0, bufnr)
+end
+
+local function set_results_content(bufnr, header_lines, output)
+  local lines = {}
+  for _, line in ipairs(header_lines) do
+    table.insert(lines, line)
+  end
+  table.insert(lines, "")
+  for _, line in ipairs(vim.split(output, "\n", { plain = true })) do
+    table.insert(lines, line)
+  end
+
+  vim.bo[bufnr].modifiable = true
+  vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
+  vim.bo[bufnr].modifiable = false
+end
+
+local function set_quickfix_from_output(output)
+  local items = {}
+  for _, line in ipairs(vim.split(output, "\n", { plain = true, trimempty = true })) do
+    local file, lnum = line:match("%s+in%s+([^:]+):line%s+(%d+)")
+    if file and lnum then
+      table.insert(items, {
+        filename = file,
+        lnum = tonumber(lnum),
+        text = vim.trim(line),
+      })
+    end
+  end
+
+  if #items > 0 then
+    vim.fn.setqflist({}, "r", { title = "Dotnet Test Results", items = items })
   end
 end
 
@@ -217,22 +269,36 @@ local function run_dotnet_test(csproj, fqn)
     "--no-build",
   }
 
-  notify(vim.log.levels.INFO, "Running: dotnet test " .. csproj .. " --filter FullyQualifiedName=" .. fqn)
+  notify(vim.log.levels.INFO, "Running .NET tests...")
 
-  vim.system(cmd, {
-    text = true,
-    stdout = function(_, data)
-      stream_output(vim.log.levels.INFO, data)
-    end,
-    stderr = function(_, data)
-      stream_output(vim.log.levels.WARN, data)
-    end,
-  }, function(obj)
-    if obj.code == 0 then
-      notify(vim.log.levels.INFO, "dotnet test passed")
-    else
-      notify(vim.log.levels.ERROR, "dotnet test failed (exit " .. tostring(obj.code) .. ")")
-    end
+  vim.system(cmd, { text = true }, function(obj)
+    vim.schedule(function()
+      local stdout = obj.stdout or ""
+      local stderr = obj.stderr or ""
+      local combined = stdout
+      if stderr ~= "" then
+        combined = combined .. "\n" .. stderr
+      end
+
+      local header = {
+        "Dotnet test results",
+        "Time: " .. os.date("%Y-%m-%d %H:%M:%S"),
+        "Project: " .. csproj,
+        "Filter: FullyQualifiedName=" .. fqn,
+        "Exit code: " .. tostring(obj.code),
+      }
+
+      local buf = ensure_results_buf()
+      set_results_content(buf, header, combined)
+      open_results_split(buf)
+
+      if obj.code == 0 then
+        notify(vim.log.levels.INFO, "Tests passed")
+      else
+        notify(vim.log.levels.WARN, "Tests failed")
+        set_quickfix_from_output(combined)
+      end
+    end)
   end)
 end
 

@@ -88,3 +88,9 @@ vim.keymap.set("n", "<leader>dt", function()
     require("dotnet_tests").run_nearest_test()
   end, { desc = "Run nearest dotnet test" })
 
+vim.keymap.set("n", "<leader>df", function()
+    require("dotnet_tests").run_test_in_file()
+  end, { desc = "Run a test from this file" })
+
+
+

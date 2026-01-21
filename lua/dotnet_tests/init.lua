@@ -123,6 +123,71 @@ local function has_test_attribute(bufnr, start_line)
   return false
 end
 
+local function collect_tests_from_document_symbols(symbols, bufnr)
+  local tests = {}
+
+  local function walk(nodes, scope)
+    for _, sym in ipairs(nodes) do
+      local next_scope = scope
+      if is_scope_symbol(sym.kind) then
+        next_scope = vim.list_extend(vim.deepcopy(scope), { sym.name })
+      end
+
+      if is_method_symbol(sym.kind) and sym.range then
+        if has_test_attribute(bufnr, sym.range.start.line) then
+          table.insert(tests, { symbol = sym, scope = scope })
+        end
+      end
+
+      if sym.children then
+        walk(sym.children, next_scope)
+      end
+    end
+  end
+
+  walk(symbols, {})
+  return tests
+end
+
+local function collect_tests_from_symbol_info(symbols, bufnr)
+  local tests = {}
+  for _, sym in ipairs(symbols) do
+    local range = sym.location and sym.location.range
+    if range and is_method_symbol(sym.kind) then
+      if has_test_attribute(bufnr, range.start.line) then
+        local scope = {}
+        if sym.containerName and sym.containerName ~= "" then
+          scope = vim.split(sym.containerName, ".", { plain = true })
+        end
+        table.insert(tests, { symbol = sym, scope = scope })
+      end
+    end
+  end
+  return tests
+end
+
+-- Try to read the namespace declaration from the top of the file.
+local function get_namespace_from_buffer(bufnr)
+  local lines = vim.api.nvim_buf_get_lines(bufnr, 0, 80, false)
+  for _, line in ipairs(lines) do
+    local ns = line:match("^%s*namespace%s+([%w%._]+)%s*[;{]")
+    if ns then
+      return ns
+    end
+  end
+  return nil
+end
+
+local function build_fqn(bufnr, scope, method_name)
+  local parts = vim.deepcopy(scope)
+  local ns = get_namespace_from_buffer(bufnr)
+  if ns and (parts[1] ~= ns) then
+    table.insert(parts, 1, ns)
+  end
+  table.insert(parts, method_name)
+  return table.concat(parts, ".")
+end
+
 -- Find the closest .csproj by walking upward from the current file directory.
 local function find_csproj(start_dir)
   local matches = vim.fs.find(function(name)
@@ -169,18 +234,6 @@ local function run_dotnet_test(csproj, fqn)
       notify(vim.log.levels.ERROR, "dotnet test failed (exit " .. tostring(obj.code) .. ")")
     end
   end)
-end
-
--- Try to read the namespace declaration from the top of the file.
-local function get_namespace_from_buffer(bufnr)
-  local lines = vim.api.nvim_buf_get_lines(bufnr, 0, 80, false)
-  for _, line in ipairs(lines) do
-    local ns = line:match("^%s*namespace%s+([%w%._]+)%s*[;{]")
-    if ns then
-      return ns
-    end
-  end
-  return nil
 end
 
 function M.run_nearest_test()
@@ -233,13 +286,7 @@ function M.run_nearest_test()
     end
 
     -- Build FullyQualifiedName from namespace + containing types + method.
-    local scope = vim.deepcopy(method_info.scope)
-    local ns = get_namespace_from_buffer(bufnr)
-    if ns and (scope[1] ~= ns) then
-      table.insert(scope, 1, ns)
-    end
-    table.insert(scope, method_symbol.name)
-    local fqn = table.concat(scope, ".")
+    local fqn = build_fqn(bufnr, method_info.scope, method_symbol.name)
 
     -- Locate the closest .csproj and run dotnet test.
     local csproj = find_csproj(vim.fs.dirname(bufname))
@@ -249,6 +296,64 @@ function M.run_nearest_test()
     end
 
     run_dotnet_test(csproj, fqn)
+  end)
+end
+
+function M.run_test_in_file()
+  local bufnr = vim.api.nvim_get_current_buf()
+  local bufname = vim.api.nvim_buf_get_name(bufnr)
+  if bufname == "" then
+    notify(vim.log.levels.WARN, "No file name for current buffer")
+    return
+  end
+
+  local params = { textDocument = vim.lsp.util.make_text_document_params(bufnr) }
+  vim.lsp.buf_request(bufnr, "textDocument/documentSymbol", params, function(err, result)
+    if err then
+      notify(vim.log.levels.ERROR, "LSP documentSymbol error: " .. err.message)
+      return
+    end
+    if not result or vim.tbl_isempty(result) then
+      notify(vim.log.levels.WARN, "No symbols from LSP")
+      return
+    end
+
+    local tests
+    if result[1].range then
+      tests = collect_tests_from_document_symbols(result, bufnr)
+    else
+      tests = collect_tests_from_symbol_info(result, bufnr)
+    end
+
+    if not tests or vim.tbl_isempty(tests) then
+      notify(vim.log.levels.WARN, "No tests found in file")
+      return
+    end
+
+    local choices = {}
+    for _, item in ipairs(tests) do
+      local fqn = build_fqn(bufnr, item.scope, item.symbol.name)
+      table.insert(choices, { label = fqn, fqn = fqn })
+    end
+
+    vim.ui.select(choices, {
+      prompt = "Select test",
+      format_item = function(item)
+        return item.label
+      end,
+    }, function(selected)
+      if not selected then
+        return
+      end
+
+      local csproj = find_csproj(vim.fs.dirname(bufname))
+      if not csproj then
+        notify(vim.log.levels.ERROR, "No .csproj found for current file")
+        return
+      end
+
+      run_dotnet_test(csproj, selected.fqn)
+    end)
   end)
 end
 

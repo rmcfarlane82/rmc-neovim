@@ -2,6 +2,22 @@ local M = {}
 
 local SymbolKind = vim.lsp.protocol.SymbolKind
 
+local state = {
+  test_projects_by_root = {},
+}
+
+local ensure_results_buf
+local open_results_split
+local set_results_content
+local append_results_content
+local set_quickfix_items
+local combined_output
+local execute_dotnet_test
+local parse_trx_failed_tests
+local relpath_from_root
+
+local run_dotnet_test
+
 local test_attributes = {
   "Fact",
   "Theory",
@@ -188,6 +204,190 @@ local function build_fqn(bufnr, scope, method_name)
   return table.concat(parts, ".")
 end
 
+local function build_scope_fqn(bufnr, scope)
+  local parts = vim.deepcopy(scope)
+  local ns = get_namespace_from_buffer(bufnr)
+  if ns and (parts[1] ~= ns) then
+    table.insert(parts, 1, ns)
+  end
+  return table.concat(parts, ".")
+end
+
+local function build_filter_for_tests(tests, bufnr)
+  local max_len = 1500
+  local filters = {}
+  for _, item in ipairs(tests) do
+    local fqn = build_fqn(bufnr, item.scope, item.symbol.name)
+    table.insert(filters, "FullyQualifiedName=" .. fqn)
+  end
+
+  local exact = table.concat(filters, "|")
+  if #exact <= max_len then
+    return exact, "exact", nil
+  end
+
+  local class_filters = {}
+  local seen = {}
+  for _, item in ipairs(tests) do
+    local class_fqn = build_scope_fqn(bufnr, item.scope)
+    if class_fqn ~= "" and not seen[class_fqn] then
+      seen[class_fqn] = true
+      table.insert(class_filters, "FullyQualifiedName~" .. class_fqn)
+    end
+  end
+
+  local class_expr = table.concat(class_filters, "|")
+  if class_expr ~= "" and #class_expr <= max_len then
+    return class_expr, "class", "Filter too long; using class-level filter"
+  end
+
+  return nil, "project", "Filter too long; running full project"
+end
+
+local function find_root(start_dir)
+  local sln = vim.fs.find(function(name)
+    return name:match("%.sln$")
+  end, { path = start_dir, upward = true, type = "file", limit = 1 })
+  if sln[1] then
+    return vim.fs.dirname(sln[1])
+  end
+
+  local git = vim.fs.find(function(name)
+    return name == ".git"
+  end, { path = start_dir, upward = true, type = "directory", limit = 1 })
+  if git[1] then
+    return vim.fs.dirname(git[1])
+  end
+
+  return nil
+end
+
+local function is_test_project(csproj_path)
+  local ok, lines = pcall(vim.fn.readfile, csproj_path)
+  if not ok or not lines then
+    return false
+  end
+
+  local content = string.lower(table.concat(lines, "\n"))
+  if content:find("microsoft.net.test.sdk", 1, true) then
+    return true
+  end
+  if content:find('packagereference include="xunit"', 1, true) then
+    return true
+  end
+  if content:find('packagereference include="nunit"', 1, true) then
+    return true
+  end
+  if content:find('packagereference include="mstest.testframework"', 1, true) then
+    return true
+  end
+
+  return false
+end
+
+local function discover_test_projects(root)
+  local matches = vim.fs.find(function(name, path)
+    if not name:match("%.csproj$") then
+      return false
+    end
+    if path:find("/bin/") or path:find("/obj/") or path:find("/.git/") then
+      return false
+    end
+    return true
+  end, { path = root, type = "file", limit = math.huge })
+
+  local results = {}
+  for _, csproj in ipairs(matches) do
+    if is_test_project(csproj) then
+      table.insert(results, csproj)
+    end
+  end
+
+  table.sort(results)
+  return results
+end
+
+local function get_cached_test_projects(root, refresh)
+  if not refresh and state.test_projects_by_root[root] then
+    return state.test_projects_by_root[root]
+  end
+  local projects = discover_test_projects(root)
+  state.test_projects_by_root[root] = projects
+  return projects
+end
+
+relpath_from_root = function(root, path)
+  local rel = vim.fs.relpath(root, path)
+  if rel then
+    return rel
+  end
+  return vim.fn.fnamemodify(path, ":.")
+end
+
+local function run_project_tests(csproj_path, header_label)
+  run_dotnet_test(csproj_path, nil, header_label, "project", nil)
+end
+
+local function run_multiple_projects(csproj_paths, root)
+  notify(vim.log.levels.INFO, "Running .NET tests...")
+
+  local buf = ensure_results_buf()
+  local header = {
+    "Dotnet test results",
+    "Time: " .. os.date("%Y-%m-%d %H:%M:%S"),
+    "Target: All test projects",
+    "Root: " .. root,
+    "Projects: " .. tostring(#csproj_paths),
+  }
+  set_results_content(buf, header, "")
+  open_results_split(buf)
+
+  local combined_items = {}
+  local any_failed = false
+  local index = 1
+
+  local function run_next()
+    local csproj = csproj_paths[index]
+    if not csproj then
+      set_quickfix_items(combined_items)
+      if any_failed then
+        notify(vim.log.levels.WARN, "Some test projects failed")
+      else
+        notify(vim.log.levels.INFO, "All test projects passed")
+      end
+      return
+    end
+
+    local rel = relpath_from_root(root, csproj)
+    local separator = {
+      string.rep("=", 60),
+      "Project: " .. rel,
+      string.rep("-", 60),
+    }
+    append_results_content(buf, separator)
+
+    execute_dotnet_test(csproj, nil, function(obj, trx_path)
+      local combined = combined_output(obj)
+      local lines = vim.split(combined, "\n", { plain = true })
+      append_results_content(buf, lines)
+
+      if obj.code ~= 0 then
+        any_failed = true
+      end
+
+      local items = parse_trx_failed_tests(trx_path)
+      if items and #items > 0 then
+        vim.list_extend(combined_items, items)
+      end
+
+      index = index + 1
+      run_next()
+    end)
+  end
+
+  run_next()
+end
+
 -- Find the closest .csproj by walking upward from the current file directory.
 local function find_csproj(start_dir)
   local matches = vim.fs.find(function(name)
@@ -196,7 +396,7 @@ local function find_csproj(start_dir)
   return matches[1]
 end
 
-local function ensure_results_buf()
+ensure_results_buf = function()
   local name = "Dotnet Test Results"
   local existing = vim.fn.bufnr(name)
   if existing > 0 then
@@ -212,7 +412,7 @@ local function ensure_results_buf()
   return buf
 end
 
-local function open_results_split(bufnr)
+open_results_split = function(bufnr)
   for _, win in ipairs(vim.api.nvim_list_wins()) do
     if vim.api.nvim_win_get_buf(win) == bufnr then
       vim.api.nvim_set_current_win(win)
@@ -225,7 +425,7 @@ local function open_results_split(bufnr)
   vim.api.nvim_win_set_buf(0, bufnr)
 end
 
-local function set_results_content(bufnr, header_lines, output)
+set_results_content = function(bufnr, header_lines, output)
   local lines = {}
   for _, line in ipairs(header_lines) do
     table.insert(lines, line)
@@ -237,6 +437,15 @@ local function set_results_content(bufnr, header_lines, output)
 
   vim.bo[bufnr].modifiable = true
   vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
+  vim.bo[bufnr].modifiable = false
+end
+
+append_results_content = function(bufnr, lines)
+  if not lines or #lines == 0 then
+    return
+  end
+  vim.bo[bufnr].modifiable = true
+  vim.api.nvim_buf_set_lines(bufnr, -1, -1, false, lines)
   vim.bo[bufnr].modifiable = false
 end
 
@@ -258,47 +467,142 @@ local function set_quickfix_from_output(output)
   end
 end
 
--- Run dotnet test with a FullyQualifiedName filter.
-local function run_dotnet_test(csproj, fqn)
+local function build_trx_path()
+  return vim.fn.tempname() .. ".trx"
+end
+
+parse_trx_failed_tests = function(trx_path)
+  local ok, lines = pcall(vim.fn.readfile, trx_path)
+  if not ok or not lines then
+    return {}
+  end
+
+  local items = {}
+  local collecting = false
+  local block_lines = {}
+
+  local function handle_block(block)
+    local outcome = block:match('outcome="([^"]+)"')
+    if outcome ~= "Failed" then
+      return
+    end
+
+    local test_name = block:match('testName="([^"]+)"') or "Unknown test"
+    local message = block:match("<Message>(.-)</Message>") or ""
+    local stack = block:match("<StackTrace>(.-)</StackTrace>") or ""
+    message = message:gsub("&lt;", "<"):gsub("&gt;", ">"):gsub("&amp;", "&")
+    stack = stack:gsub("&lt;", "<"):gsub("&gt;", ">"):gsub("&amp;", "&")
+
+    local file, lnum = stack:match("%s+in%s+([^:]+):line%s+(%d+)")
+    local msg_line = vim.split(vim.trim(message), "\n", { plain = true })[1] or ""
+    local text = test_name
+    if msg_line ~= "" then
+      text = text .. ": " .. msg_line
+    end
+
+    local item = { text = text }
+    if file and lnum then
+      item.filename = file
+      item.lnum = tonumber(lnum)
+    end
+    table.insert(items, item)
+  end
+
+  for _, line in ipairs(lines) do
+    if not collecting and line:find("<UnitTestResult") then
+      collecting = true
+      block_lines = { line }
+    elseif collecting then
+      table.insert(block_lines, line)
+    end
+
+    if collecting and line:find("</UnitTestResult>") then
+      collecting = false
+      handle_block(table.concat(block_lines, "\n"))
+      block_lines = {}
+    end
+  end
+
+  return items
+end
+
+local function set_quickfix_from_trx(trx_path)
+  local items = parse_trx_failed_tests(trx_path)
+  if #items > 0 then
+    vim.fn.setqflist({}, "r", { title = "Dotnet Test Results", items = items })
+  end
+end
+
+set_quickfix_items = function(items)
+  if items and #items > 0 then
+    vim.fn.setqflist({}, "r", { title = "Dotnet Test Results", items = items })
+  end
+end
+
+combined_output = function(obj)
+  local stdout = obj.stdout or ""
+  local stderr = obj.stderr or ""
+  if stderr ~= "" then
+    return stdout .. "\n" .. stderr
+  end
+  return stdout
+end
+
+execute_dotnet_test = function(csproj, filter_expr, callback)
+  local trx_path = build_trx_path()
   local cmd = {
     "dotnet",
     "test",
     csproj,
-    "--filter",
-    "FullyQualifiedName=" .. fqn,
     "--no-build",
+    "--logger",
+    "trx;LogFileName=" .. trx_path,
   }
 
-  notify(vim.log.levels.INFO, "Running .NET tests...")
+  if filter_expr and filter_expr ~= "" then
+    table.insert(cmd, "--filter")
+    table.insert(cmd, filter_expr)
+  end
 
   vim.system(cmd, { text = true }, function(obj)
     vim.schedule(function()
-      local stdout = obj.stdout or ""
-      local stderr = obj.stderr or ""
-      local combined = stdout
-      if stderr ~= "" then
-        combined = combined .. "\n" .. stderr
-      end
-
-      local header = {
-        "Dotnet test results",
-        "Time: " .. os.date("%Y-%m-%d %H:%M:%S"),
-        "Project: " .. csproj,
-        "Filter: FullyQualifiedName=" .. fqn,
-        "Exit code: " .. tostring(obj.code),
-      }
-
-      local buf = ensure_results_buf()
-      set_results_content(buf, header, combined)
-      open_results_split(buf)
-
-      if obj.code == 0 then
-        notify(vim.log.levels.INFO, "Tests passed")
-      else
-        notify(vim.log.levels.WARN, "Tests failed")
-        set_quickfix_from_output(combined)
-      end
+      callback(obj, trx_path)
     end)
+  end)
+end
+
+-- Run dotnet test with a FullyQualifiedName filter.
+run_dotnet_test = function(csproj, filter_expr, target_label, filter_mode, filter_note)
+  notify(vim.log.levels.INFO, "Running .NET tests...")
+
+  execute_dotnet_test(csproj, filter_expr, function(obj, trx_path)
+    local combined = combined_output(obj)
+
+    local header = {
+      "Dotnet test results",
+      "Time: " .. os.date("%Y-%m-%d %H:%M:%S"),
+      "Project: " .. csproj,
+      "Target: " .. (target_label or "Test run"),
+      "Filter: " .. (filter_expr and filter_expr or "<none>"),
+      "Exit code: " .. tostring(obj.code),
+    }
+    if filter_mode then
+      table.insert(header, "Filter mode: " .. filter_mode)
+    end
+    if filter_note then
+      table.insert(header, "Note: " .. filter_note)
+    end
+
+    local buf = ensure_results_buf()
+    set_results_content(buf, header, combined)
+    open_results_split(buf)
+
+    if obj.code == 0 then
+      notify(vim.log.levels.INFO, "Tests passed")
+    else
+      notify(vim.log.levels.WARN, "Tests failed")
+      set_quickfix_from_trx(trx_path)
+    end
   end)
 end
 
@@ -353,6 +657,7 @@ function M.run_nearest_test()
 
     -- Build FullyQualifiedName from namespace + containing types + method.
     local fqn = build_fqn(bufnr, method_info.scope, method_symbol.name)
+    local filter_expr = "FullyQualifiedName=" .. fqn
 
     -- Locate the closest .csproj and run dotnet test.
     local csproj = find_csproj(vim.fs.dirname(bufname))
@@ -361,7 +666,7 @@ function M.run_nearest_test()
       return
     end
 
-    run_dotnet_test(csproj, fqn)
+    run_dotnet_test(csproj, filter_expr, "Test: " .. fqn, "exact", nil)
   end)
 end
 
@@ -396,7 +701,9 @@ function M.run_test_in_file()
       return
     end
 
-    local choices = {}
+    local choices = {
+      { label = "All tests in file", all = true },
+    }
     for _, item in ipairs(tests) do
       local fqn = build_fqn(bufnr, item.scope, item.symbol.name)
       table.insert(choices, { label = fqn, fqn = fqn })
@@ -418,9 +725,103 @@ function M.run_test_in_file()
         return
       end
 
-      run_dotnet_test(csproj, selected.fqn)
+      if selected.all then
+        local filter_expr, mode, note = build_filter_for_tests(tests, bufnr)
+        local relpath = vim.fn.fnamemodify(bufname, ":.")
+        run_dotnet_test(csproj, filter_expr, "All tests in file: " .. relpath, mode, note)
+      else
+        local filter_expr = "FullyQualifiedName=" .. selected.fqn
+        run_dotnet_test(csproj, filter_expr, "Test: " .. selected.fqn, "exact", nil)
+      end
     end)
   end)
 end
+
+function M.run_all_tests_in_project()
+  local bufnr = vim.api.nvim_get_current_buf()
+  local bufname = vim.api.nvim_buf_get_name(bufnr)
+  if bufname == "" then
+    notify(vim.log.levels.WARN, "No file name for current buffer")
+    return
+  end
+
+  local csproj = find_csproj(vim.fs.dirname(bufname))
+  if not csproj then
+    notify(vim.log.levels.ERROR, "No .csproj found for current file")
+    return
+  end
+
+  run_project_tests(csproj, "All tests in project: " .. csproj)
+end
+
+function M.pick_project_and_run_tests(opts)
+  local bufnr = vim.api.nvim_get_current_buf()
+  local bufname = vim.api.nvim_buf_get_name(bufnr)
+  if bufname == "" then
+    notify(vim.log.levels.WARN, "No file name for current buffer")
+    return
+  end
+
+  local root = find_root(vim.fs.dirname(bufname))
+  if not root then
+    notify(vim.log.levels.WARN, "No solution or git root found")
+    return
+  end
+
+  local refresh = opts and opts.refresh or false
+  local projects = get_cached_test_projects(root, refresh)
+  if not projects or #projects == 0 then
+    notify(vim.log.levels.WARN, "No test projects found")
+    return
+  end
+
+  local choices = {
+    { label = "All test projects", all = true },
+    { label = "Refresh projects", refresh = true },
+  }
+  for _, csproj in ipairs(projects) do
+    local rel = relpath_from_root(root, csproj)
+    table.insert(choices, { label = rel, csproj = csproj })
+  end
+
+  vim.ui.select(choices, {
+    prompt = "Select test project",
+    format_item = function(item)
+      return item.label
+    end,
+  }, function(selected)
+    if not selected then
+      return
+    end
+
+    if selected.refresh then
+      state.test_projects_by_root[root] = nil
+      vim.schedule(function()
+        M.pick_project_and_run_tests({ refresh = true })
+      end)
+      return
+    end
+
+    if selected.all then
+      run_multiple_projects(projects, root)
+      return
+    end
+
+    run_project_tests(selected.csproj, "All tests in project: " .. selected.csproj)
+  end)
+end
+
+pcall(vim.api.nvim_create_user_command, "DotnetTestProject", function()
+  require("dotnet_tests").run_all_tests_in_project()
+end, { desc = "Run all .NET tests in the current project" })
+
+pcall(vim.api.nvim_create_user_command, "DotnetTestPickProject", function()
+  require("dotnet_tests").pick_project_and_run_tests()
+end, { desc = "Pick a test project to run" })
+
+-- Example keymap:
+-- vim.keymap.set("n", "<leader>dp", function()
+--   require("dotnet_tests").run_all_tests_in_project()
+-- end, { desc = "Run all tests in project" })
 
 return M

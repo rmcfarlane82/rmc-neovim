@@ -92,5 +92,11 @@ vim.keymap.set("n", "<leader>df", function()
     require("dotnet_tests").run_test_in_file()
   end, { desc = "Run a test from this file" })
 
+ vim.keymap.set("n", "<leader>dp", function()
+    require("dotnet_tests").run_all_tests_in_project()
+  end, { desc = "Run all tests in project" })
+
+vim.keymap.set("n", "<leader>dP", function() require("dotnet_tests").pick_project_and_run_tests() end, { desc = "Pick .NET test project" })
+
 
 

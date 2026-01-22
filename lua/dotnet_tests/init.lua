@@ -5,6 +5,12 @@ local SymbolKind = vim.lsp.protocol.SymbolKind
 local state = {
   test_projects_by_root = {},
   index = {},
+  index_version = 0,
+  picker_cache = {
+    version = -1,
+    root = nil,
+    items = {},
+  },
   explorer = {
     expanded_nodes = {},
     line_map = {},
@@ -26,6 +32,11 @@ local relpath_from_root
 
 local run_dotnet_test
 local open_test_explorer
+local open_tests_picker
+local open_file_at_line
+local run_tests_in_file_path
+local run_tests_in_project_path
+local run_all_test_projects
 
 local test_attributes = {
   "Fact",
@@ -270,6 +281,10 @@ local function build_filter_for_fqns(fqns, class_fqn)
   end
 
   return nil, "project", "Filter too long; running full project"
+end
+
+local function bump_index_version()
+  state.index_version = (state.index_version or 0) + 1
 end
 
 local function find_root(start_dir)
@@ -928,6 +943,7 @@ local function schedule_index_batch(root, csproj)
       entry.batch_scheduled = false
     end
 
+    bump_index_version()
     render_explorer()
   end)
 end
@@ -979,6 +995,7 @@ local function index_test_projects(root, opts)
     end
   end
 
+  bump_index_version()
   render_explorer()
 end
 
@@ -1016,7 +1033,262 @@ local function rebuild_test_index()
   index_test_projects(root, { rebuild_cache = true })
 end
 
-local function open_file_at_line(path, line)
+local function build_snacks_items_from_index(root)
+  local cache = state.picker_cache
+  if cache and cache.version == state.index_version and cache.root == root then
+    return cache.items
+  end
+
+  local items = {}
+  local projects = get_cached_test_projects(root, false)
+
+  for project_index, csproj in ipairs(projects) do
+    local project_name = vim.fn.fnamemodify(csproj, ":t:r")
+    local total, namespaces = build_project_tree(root, csproj)
+    local project_item = {
+      text = string.format("[%s] %s", project_name, relpath_from_root(root, csproj)),
+      display = string.format("%s (%d)", relpath_from_root(root, csproj), total),
+      node_type = "project",
+      csproj = csproj,
+      tree = true,
+      last = project_index == #projects,
+    }
+    table.insert(items, project_item)
+
+    for ns_index, ns_node in ipairs(namespaces) do
+      local ns_label = ns_node.name ~= "" and ns_node.name or "(global)"
+      local ns_item = {
+        text = string.format("[%s] %s", project_name, ns_node.name ~= "" and ns_node.name or "(global)"),
+        display = string.format("%s (%d)", ns_label, ns_node.count),
+        node_type = "namespace",
+        csproj = csproj,
+        namespace = ns_node.name,
+        tree = true,
+        parent = project_item,
+        last = ns_index == #namespaces,
+      }
+      table.insert(items, ns_item)
+
+      for class_index, class_node in ipairs(ns_node.class_list) do
+        local class_label = class_node.name ~= "" and class_node.name or "(anonymous)"
+        local class_fqn = class_node.name
+        if ns_node.name and ns_node.name ~= "" then
+          class_fqn = ns_node.name .. "." .. class_node.name
+        end
+        local class_item = {
+          text = string.format("[%s] %s", project_name, class_fqn ~= "" and class_fqn or class_label),
+          display = string.format("%s (%d)", class_label, class_node.count),
+          node_type = "class",
+          csproj = csproj,
+          namespace = ns_node.name,
+          class = class_node.name,
+          class_fqn = class_fqn,
+          fqns = vim.tbl_map(function(test)
+            return test.fqn
+          end, class_node.tests),
+          tree = true,
+          parent = ns_item,
+          last = class_index == #ns_node.class_list,
+        }
+        table.insert(items, class_item)
+
+        for test_index, test in ipairs(class_node.tests) do
+          local scope = class_fqn ~= "" and class_fqn or class_label
+          local display = test.name
+          if test.path and test.line then
+            local rel = relpath_from_root(vim.fs.dirname(csproj), test.path)
+            display = string.format("%s  %s:%d", test.name, rel, test.line)
+          end
+          local test_item = {
+            text = string.format("[%s] %s::%s", project_name, scope, test.name),
+            display = display,
+            node_type = "test",
+            csproj = csproj,
+            fqn = test.fqn,
+            file = test.path,
+            line = test.line,
+            tree = true,
+            parent = class_item,
+            last = test_index == #class_node.tests,
+          }
+          if test.line then
+            test_item.pos = { test.line, 0 }
+          end
+          table.insert(items, test_item)
+        end
+      end
+    end
+  end
+
+  state.picker_cache = {
+    version = state.index_version,
+    root = root,
+    items = items,
+  }
+  return items
+end
+
+local function count_indexing_projects(root)
+  local count = 0
+  for _, entry in pairs(state.index[root] or {}) do
+    if entry.is_indexing then
+      count = count + 1
+    end
+  end
+  return count
+end
+
+open_tests_picker = function(opts)
+  local ok, Snacks = pcall(require, "snacks")
+  if not ok or not Snacks or not Snacks.picker then
+    notify(vim.log.levels.ERROR, "Snacks.nvim picker is not available")
+    return
+  end
+
+  opts = opts or {}
+  local bufnr = vim.api.nvim_get_current_buf()
+  local bufname = vim.api.nvim_buf_get_name(bufnr)
+  local root
+  if bufname ~= "" and vim.bo[bufnr].buftype ~= "nofile" then
+    root = find_root(vim.fs.dirname(bufname))
+  else
+    root = state.explorer.root
+  end
+
+  if not root then
+    notify(vim.log.levels.WARN, "No solution or git root found")
+    return
+  end
+
+  if opts.refresh then
+    index_test_projects(root, { rebuild_cache = false })
+  elseif not state.index[root] then
+    index_test_projects(root, { rebuild_cache = false })
+  end
+
+  local indexing = count_indexing_projects(root)
+  local title = "Dotnet Tests"
+  if indexing > 0 then
+    title = "Dotnet Tests (Indexing tests...)"
+  end
+
+  Snacks.picker.pick({
+    title = title,
+    prompt = "Select a test",
+    finder = function()
+      return build_snacks_items_from_index(root)
+    end,
+    format = function(item, picker)
+      local ret = {}
+      if item.tree then
+        vim.list_extend(ret, Snacks.picker.format.tree(item, picker))
+      end
+      table.insert(ret, { item.display or item.text })
+      return ret
+    end,
+    focus = "list",
+    auto_close = false,
+    show_empty = true,
+    layout = { preset = "sidebar" },
+    sort = false,
+    matcher = { keep_parents = true, sort = false },
+    preview = function(ctx)
+      local item = ctx.item
+      if item and item.file then
+        Snacks.picker.preview.file(ctx)
+        return
+      end
+      ctx.preview:reset()
+      ctx.preview:notify("No preview for this node", "warn", { item = false })
+    end,
+    actions = {
+      confirm = function(picker, item)
+        if not item then
+          return
+        end
+        if not picker.closed then
+          picker:close()
+        end
+        if item.node_type == "project" then
+          run_project_tests(item.csproj, "All tests in project: " .. item.csproj)
+        elseif item.node_type == "namespace" then
+          local namespace = item.namespace or ""
+          if namespace == "" then
+            run_project_tests(item.csproj, "Namespace: (global)")
+          else
+            local filter_expr = "FullyQualifiedName~" .. namespace
+            run_dotnet_test(item.csproj, filter_expr, "Namespace: " .. namespace, "namespace", nil)
+          end
+        elseif item.node_type == "class" then
+          local filter_expr, mode, note = build_filter_for_fqns(item.fqns or {}, item.class_fqn)
+          local label = "Class: " .. (item.class_fqn ~= "" and item.class_fqn or item.class or "(anonymous)")
+          run_dotnet_test(item.csproj, filter_expr, label, mode, note)
+        elseif item.node_type == "test" then
+          local filter_expr = "FullyQualifiedName=" .. item.fqn
+          run_dotnet_test(item.csproj, filter_expr, "Test: " .. item.fqn, "exact", nil)
+        end
+      end,
+      open_file = function(picker, item)
+        if not item or not item.file then
+          return
+        end
+        if not picker.closed then
+          picker:close()
+        end
+        open_file_at_line(item.file, item.line)
+      end,
+      run_file = function(picker, item)
+        if not item or not item.file then
+          return
+        end
+        if not picker.closed then
+          picker:close()
+        end
+        run_tests_in_file_path(item.file, item.line)
+      end,
+      run_project = function(picker, item)
+        if not item then
+          return
+        end
+        if not picker.closed then
+          picker:close()
+        end
+        if item.csproj then
+          run_project_tests(item.csproj, "All tests in project: " .. item.csproj)
+        end
+      end,
+      run_all_projects = function(picker)
+        if not picker.closed then
+          picker:close()
+        end
+        run_all_test_projects(root)
+      end,
+      close_picker = function(picker)
+        if not picker.closed then
+          picker:close()
+        end
+      end,
+    },
+    win = {
+      list = {
+        keys = {
+          ["<cr>"] = "confirm",
+          ["o"] = "open_file",
+          ["a"] = "run_file",
+          ["p"] = "run_project",
+          ["A"] = "run_all_projects",
+          ["q"] = "close_picker",
+        },
+        wo = {
+          number = false,
+          relativenumber = false,
+        },
+      },
+    },
+  })
+end
+
+open_file_at_line = function(path, line)
   local explorer_buf = state.explorer.bufnr
   local target_win
   for _, win in ipairs(vim.api.nvim_list_wins()) do
@@ -1031,7 +1303,34 @@ local function open_file_at_line(path, line)
 
   vim.api.nvim_set_current_win(target_win)
   vim.cmd("edit " .. vim.fn.fnameescape(path))
-  vim.api.nvim_win_set_cursor(target_win, { line, 0 })
+  local target_buf = vim.api.nvim_win_get_buf(target_win)
+  local max_line = vim.api.nvim_buf_line_count(target_buf)
+  local target_line = tonumber(line) or 1
+  if target_line < 1 then
+    target_line = 1
+  elseif target_line > max_line then
+    target_line = max_line
+  end
+  vim.api.nvim_win_set_cursor(target_win, { target_line, 0 })
+end
+
+run_tests_in_file_path = function(path, line)
+  open_file_at_line(path, line or 1)
+  M.run_test_in_file()
+end
+
+run_tests_in_project_path = function(path, line)
+  open_file_at_line(path, line or 1)
+  M.run_all_tests_in_project()
+end
+
+run_all_test_projects = function(root)
+  local projects = get_cached_test_projects(root, false)
+  if not projects or #projects == 0 then
+    notify(vim.log.levels.WARN, "No test projects found")
+    return
+  end
+  run_multiple_projects(projects, root)
 end
 
 local function handle_explorer_enter()
@@ -1552,6 +1851,10 @@ function M.rebuild_test_index()
   rebuild_test_index()
 end
 
+function M.open_tests_picker(opts)
+  open_tests_picker(opts)
+end
+
 pcall(vim.api.nvim_create_user_command, "DotnetTestProject", function()
   require("dotnet_tests").run_all_tests_in_project()
 end, { desc = "Run all .NET tests in the current project" })
@@ -1571,6 +1874,10 @@ end, { desc = "Refresh Dotnet test index" })
 pcall(vim.api.nvim_create_user_command, "DotnetTestIndexRebuild", function()
   require("dotnet_tests").rebuild_test_index()
 end, { desc = "Rebuild Dotnet test index" })
+
+pcall(vim.api.nvim_create_user_command, "DotnetTests", function()
+  require("dotnet_tests").open_tests_picker()
+end, { desc = "Pick a .NET test (Snacks)" })
 
 -- Example keymap:
 -- vim.keymap.set("n", "<leader>dp", function()

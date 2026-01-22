@@ -102,4 +102,6 @@ vim.keymap.set("n", "<leader>de", function()
     require("dotnet_tests").open_test_explorer()
   end, { desc = "Open Dotnet Test Explorer" })
 
-
+vim.keymap.set("n", "<leader>ds", function()
+    require("dotnet_tests").open_tests_picker()
+  end, { desc = "Dotnet Tests picker (Snacks)" })

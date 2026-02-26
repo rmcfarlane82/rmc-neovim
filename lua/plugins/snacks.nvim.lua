@@ -5,7 +5,10 @@ local picker = require("config.snacks-picker")
 local user_secrets = require("config.user_secrets")
 local dotnet_runner = require("config.dotnet-runner")
 local terminals = require("custom.terminals")
+local explorer_width = require("custom.snacks-explorer-width")
 local buffer_sidebar_width = 50
+
+explorer_width.setup()
 
 dotnet_runner.setup()
 
@@ -268,10 +271,15 @@ return {
 			{ "<leader>gP", function() Snacks.picker.gh_pr({ state = "all" }) end,    desc = "Pull Requests (all)" },
 			{ "<leader>gB", function() Snacks.gitbrowse.open() end,                   desc = "Browser" },
 
+			{ "<leader>fj", function() Snacks.picker.jumps() end,                     desc = "Jumps" },
+			{ '<leader>f"', function() Snacks.picker.registers() end,                 desc = "Registers" },
+			{ "<leader>fH", function() Snacks.picker.highlights() end,                desc = "Highlights" },
+			{ "<leader>fi", function() Snacks.picker.icons() end,                     desc = "Icons" },
+
 			{
 				"<leader>ff",
 				function()
-					Snacks.picker.files({
+					Snacks.picker.smart({
 						layout = { preset = "ivy" },
 					})
 				end,
@@ -342,14 +350,14 @@ return {
 			{
 				"<leader>e",
 				function()
-					Snacks.explorer()
+					explorer_width.open()
 				end,
 				desc = "File Explorer",
 			},
 			{
 				"<C-e>",
 				function()
-					Snacks.explorer()
+					explorer_width.open()
 				end,
 				desc = "File Explorer",
 			},

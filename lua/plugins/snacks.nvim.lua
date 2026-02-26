@@ -1,14 +1,11 @@
 local Snacks = require("snacks")
-local scroll = require("config.snacks-scroll")
-local statuscolumn = require("config.snacks-statuscolumn")
-local picker = require("config.snacks-picker")
-local user_secrets = require("config.user_secrets")
-local dotnet_runner = require("config.dotnet-runner")
+local user_secrets = require("custom.user_secrets")
+local dotnet_runner = require("custom.dotnet-runner")
 local terminals = require("custom.terminals")
-local explorer_width = require("custom.snacks-explorer-width")
+local explorer = require("custom.stateful-snacks-explorer")
 local buffer_sidebar_width = 50
 
-explorer_width.setup()
+explorer.setup()
 
 dotnet_runner.setup()
 
@@ -51,12 +48,90 @@ return {
 		indent = { enabled = true },
 		input = { enabled = true },
 		keymap = { enabled = true },
-		picker = picker,
+		picker = {
+			enabled = true,
+			formatters = {
+				file = {
+					filename_first = true,
+					git_status_hl = false, -- keep folder/file colors stable; git signs still show
+				},
+			},
+			win = {
+				input = {
+					keys = {
+						["<Esc>"] = { "focus_list", mode = { "n", "i" } },
+						["jk"] = { "focus_list", mode = { "n", "i" } },
+						["<a-h>"] = false,
+					},
+				},
+				list = {
+					keys = {
+						["<a-h>"] = false,
+					},
+				},
+			},
+			sources = {
+				explorer = {
+					layout = {
+						preview = "main",
+						hidden = { "preview" },
+					},
+				},
+			},
+			layouts = {
+				vertical = {
+					config = function(layout)
+						local preview_height = 0.75
+						local list_height = 1 - preview_height
+
+						if not layout.layout then
+							return layout
+						end
+
+						for _, section in ipairs(layout.layout) do
+							if section.win == "preview" then
+								section.height = preview_height
+							elseif section.win == "list" then
+								section.height = list_height
+							end
+						end
+
+						return layout
+					end,
+				},
+			},
+		},
 		notifier = { enabled = true },
 		quickfile = { enabled = true },
 		scope = { enabled = true },
-		scroll = scroll,
-		statuscolumn = statuscolumn,
+		scroll = {
+			enabled = true,
+			animate = {
+				duration = { step = 10, total = 200 },
+				easing = "linear",
+			},
+			animate_repeat = {
+				delay = 100, -- delay in ms before using the repeat animation
+				duration = { step = 5, total = 50 },
+				easing = "linear",
+			},
+			filter = function(buf)
+				return vim.g.snacks_scroll ~= false and vim.b[buf].snacks_scroll ~= false and vim.bo[buf].buftype ~= "terminal"
+			end,
+		},
+		statuscolumn = {
+			enabled = true,
+			left = { "mark", "sign" }, -- priority of signs on the left (high to low)
+			right = { "fold", "git" }, -- priority of signs on the right (high to low)
+			folds = {
+				open = false,
+				git_hl = false,
+			},
+			git = {
+				patterns = { "GitSign", "MiniDiffSign" },
+			},
+			refresh = 50,
+		},
 		words = { enabled = true },
 		terminal = {
 			enabled = true,
@@ -69,7 +144,12 @@ return {
 		animate = { enabled = true },
 		bufdelete = { enabled = true },
 		zen = { enabled = true },
-		dim = { enabled = true },
+		dim = {
+			enabled = true,
+			scope = {
+				min_size = 7,
+			},
+		},
 		gitbrowse = { enabled = true },
 		lazygit = {
 			-- Close the terminal buffer when lazygit exits to avoid lingering "process exited" messages
@@ -281,6 +361,7 @@ return {
 				function()
 					Snacks.picker.smart({
 						layout = { preset = "ivy" },
+						filter = { cwd = true },
 					})
 				end,
 				desc = "Find Files"
@@ -350,14 +431,14 @@ return {
 			{
 				"<leader>e",
 				function()
-					explorer_width.open()
+					explorer.open()
 				end,
 				desc = "File Explorer",
 			},
 			{
 				"<C-e>",
 				function()
-					explorer_width.open()
+					explorer.open()
 				end,
 				desc = "File Explorer",
 			},

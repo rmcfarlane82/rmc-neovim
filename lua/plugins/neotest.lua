@@ -1,4 +1,4 @@
-local neotest_runner = require("config.neotest-runner")
+local neotest_runner = require("custom.neotest-runner")
 
 return {
 	"nvim-neotest/neotest",

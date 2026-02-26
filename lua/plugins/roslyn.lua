@@ -9,10 +9,6 @@ return {
 	},
 	lazy = false,
 	config = function()
-		local function restart_roslyn()
-			vim.cmd("LspRestart roslyn")
-		end
-
 		vim.lsp.config("roslyn", {
 			settings = {
 				-- ============================
@@ -49,41 +45,9 @@ return {
 		})
 		vim.lsp.enable("roslyn")
 
-		vim.api.nvim_create_autocmd("BufWritePost", {
-			group = vim.api.nvim_create_augroup("RoslynProjectRefresh", { clear = true }),
-			pattern = { "*.csproj", "*.sln", "*.slnf", "*.slnx" },
-			callback = restart_roslyn,
-			desc = "Restart Roslyn when solution/project files change",
-		})
-
-		vim.api.nvim_create_autocmd("BufNewFile", {
-			group = vim.api.nvim_create_augroup("RoslynNewFile", { clear = true }),
-			pattern = { "*.cs" },
-			callback = function(args)
-				vim.b[args.buf].roslyn_new_file = true
-			end,
-			desc = "Mark new C# files for Roslyn restart on first save",
-		})
-
-		vim.api.nvim_create_autocmd("BufWritePost", {
-			group = vim.api.nvim_create_augroup("RoslynNewFile", { clear = false }),
-			pattern = { "*.cs" },
-			callback = function(args)
-				if vim.b[args.buf].roslyn_new_file then
-					vim.b[args.buf].roslyn_new_file = nil
-					restart_roslyn()
-				end
-			end,
-			desc = "Restart Roslyn after saving a newly created C# file",
-		})
+		require("custom.roslyn-refresh").setup()
 	end,
 	init = function()
-		-- We add the Razor file types before the plugin loads.
-		vim.filetype.add({
-			extension = {
-				razor = "razor",
-				cshtml = "razor",
-			},
-		})
+		require("custom.csharp-filetypes").setup()
 	end,
 }

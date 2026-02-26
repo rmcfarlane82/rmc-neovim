@@ -23,6 +23,20 @@ opt.guicursor = "n-v-c:block,i-ci:ver25,t:ver25"
 opt.clipboard = "unnamedplus"
 
 
+local function set_cursor_colors()
+  vim.api.nvim_set_hl(0, "Cursor", { fg = "black", bg = "#ffff00" })
+  vim.api.nvim_set_hl(0, "iCursor", { fg = "black", bg = "#ffff00" })
+  vim.api.nvim_set_hl(0, "rCursor", { fg = "black", bg = "#ffff00" })
+end
+
+set_cursor_colors()
+
+opt.guicursor = "n-v-c:block-Cursor,i-ci-ve:ver25-iCursor,r-cr-o:hor20-rCursor,t:ver25-iCursor"
+
+vim.api.nvim_create_autocmd("ColorScheme", {
+  callback = set_cursor_colors,
+})
+
 vim.cmd [[autocmd FocusGained,BufEnter * checktime]]
 
 local indent_group = vim.api.nvim_create_augroup("CustomIndent", { clear = true })
@@ -41,4 +55,6 @@ end
 
 set_indent({ "lua", "typescript", "typescriptreact" }, 2)
 set_indent({ "cs", "csharp" }, 4)
+
+vim.api.nvim_command("hi Normal guibg=none ctermbg=none")
 

@@ -142,25 +142,46 @@ return {
 				mode = { "n" },
 			},
 			{
-				"<leader>zd",
+				"<leader>ud",
 				function()
 					Snacks.dim()
 				end,
 				desc = "Dim on",
 			},
 			{
-				"<leader>zD",
+				"<leader>uD",
 				function()
 					Snacks.dim.disable()
 				end,
 				desc = "Dim off",
 			},
 			{
-				"<leader>zz",
+				"<leader>uz",
 				function()
-					Snacks.zen.zen()
+					Snacks.zen.zen({
+						-- You can add any `Snacks.toggle` id here.
+						-- Toggle state is restored when the window is closed.
+						-- Toggle config options are NOT merged.
+						---@type table<string, boolean>
+						toggles = {
+							dim = true,
+							git_signs = false,
+							mini_diff_signs = false,
+							line_number = true,
+							-- diagnostics = false,
+							-- inlay_hints = false,
+						},
+						center = true, -- center the window
+						show = {
+							statusline = true, -- can only be shown when using the global statusline
+							tabline = false,
+						},
+						win = {
+							width = 180,
+						},
+					})
 				end,
-				desc = "Zen toggle",
+				desc = "Toggle Zen Mode",
 			},
 			{
 				"<leader>gl",

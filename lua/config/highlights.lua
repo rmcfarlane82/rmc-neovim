@@ -103,6 +103,13 @@ local function apply()
 	-- Extra groups (what used to be base46.hl_add)
 	---------------------------------------------------------------------------
 	local extra = {
+	--	SnacksTerminal                         = { bg = "none" },
+	--	SnacksTerminalBorder                   = { bg = "none" },
+		NormalFloat                            = { bg = "none" },
+	--	FloatBorder                            = { bg = "none" },
+	--	Terminal                               = { bg = "none" },
+	--Normal = { bg = "#1e1e1e" },
+
 		-- Rainbow delimiters
 		RainbowDelimiterRed                    = { fg = RB_PINK },
 		RainbowDelimiterYellow                 = { fg = RB_YELLOW },
@@ -182,7 +189,8 @@ local function apply()
 		FlashCurrent                           = { fg = "#000000", bg = "#dec014", bold = true },
 		FlashBackdrop                          = { fg = SURFACE0 },
 
-	--	WinSeparator                           = { fg = SURFACE0 },
+		Special                                = { fg = BLUE },
+		WinSeparator                           = { fg = SURFACE0 },
 	}
 
 	local snacks_picker = {

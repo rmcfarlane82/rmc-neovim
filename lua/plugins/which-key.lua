@@ -2,6 +2,7 @@ return {
   "folke/which-key.nvim",
   event = "VeryLazy",
   opts = {
+		preset = "helix",
     plugins = {
       marks = true,
       registers = true,
@@ -20,8 +21,8 @@ return {
         { "<leader>", group = "leader" },
         { "<leader>u", group = "toggle" },
         { "<leader>g", group = "git" },
-        { "<leader>s", group = "search" },
-        { "<leader>f", group = "file" },
+        { "<leader>s", group = "surround" },
+        { "<leader>f", group = "find" },
         { "<leader>b", group = "buffer" },
       },
     },

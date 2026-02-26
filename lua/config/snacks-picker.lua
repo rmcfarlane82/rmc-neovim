@@ -21,6 +21,12 @@ return {
 				-- your existing ones
 				["<Esc>"] = { "focus_list", mode = { "n", "i" } },
 				["jk"] = { "focus_list", mode = { "n", "i" } },
+				["<a-h>"] = false,
+			},
+		},
+		list = {
+			keys = {
+				["<a-h>"] = false,
 			},
 		},
 	},

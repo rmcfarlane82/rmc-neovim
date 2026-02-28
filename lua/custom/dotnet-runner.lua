@@ -21,10 +21,6 @@ local function find_csprojs(root)
 	end, files)
 end
 
-function M.has_projects(root)
-	return #find_csprojs(root) > 0
-end
-
 local function read_launch_profiles(csproj)
 	local dir = vim.fs.dirname(csproj)
 	local candidates = {

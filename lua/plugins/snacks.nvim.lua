@@ -417,7 +417,6 @@ return {
 			{ "<leader>fu", function() user_secrets.open_picker() end,      desc = "User Secrets" },
 		}
 
-		if dotnet_runner.has_projects() then
 			table.insert(mappings, {
 				"<leader>fr",
 				function()
@@ -425,7 +424,6 @@ return {
 				end,
 				desc = ".NET run (pick project/profile)",
 			})
-		end
 
 		vim.list_extend(mappings, {
 			{

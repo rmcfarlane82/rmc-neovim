@@ -1,0 +1,353 @@
+--- Startup times for process: Primary (or UI client) ---
+
+times in msec
+ clock   self+sourced   self:  sourced script
+ clock   elapsed:              other lines
+
+000.004  000.004: --- NVIM STARTING ---
+000.040  000.035: event init
+000.146  000.107: early init
+009.106  008.960: locale set
+009.149  000.043: init first window
+009.704  000.555: inits 1
+009.717  000.014: window checked
+009.722  000.005: parsing arguments
+010.613  000.319  000.319: require('vim.shared')
+011.146  000.136  000.136: require('vim.inspect')
+011.356  000.193  000.193: require('vim._options')
+011.360  000.739  000.410: require('vim._editor')
+011.361  001.142  000.084: require('vim._init_packages')
+011.366  000.501: init lua interpreter
+011.443  000.077: expanding arguments
+011.461  000.018: inits 2
+011.691  000.230: init highlight
+011.717  000.026: clear screen
+012.109  000.028  000.028: require('vim.keymap')
+012.602  000.124  000.124: sourcing nvim_exec2()
+016.799  005.080  004.928: require('vim._defaults')
+016.804  000.007: init default mappings & autocommands
+017.630  000.076  000.076: sourcing C:\Program Files\Neovim\share\nvim\runtime\ftplugin.vim
+017.792  000.034  000.034: sourcing C:\Program Files\Neovim\share\nvim\runtime\indent.vim
+018.910  000.680  000.680: require('lazy')
+018.940  000.013  000.013: require('ffi')
+019.371  000.227  000.227: require('vim.fs')
+019.603  000.227  000.227: require('vim.uri')
+019.617  000.674  000.220: require('vim.loader')
+019.914  000.248  000.248: require('lazy.stats')
+020.327  000.187  000.187: require('lazy.core.util')
+020.479  000.147  000.147: require('lazy.core.config')
+020.757  000.136  000.136: require('lazy.core.handler')
+021.148  000.118  000.118: require('lazy.pkg')
+021.154  000.277  000.158: require('lazy.core.meta')
+021.158  000.397  000.120: require('lazy.core.plugin')
+021.163  000.680  000.147: require('lazy.core.loader')
+022.073  000.217  000.217: require('lazy.async')
+022.369  000.139  000.139: require('lazy.manage.process')
+022.542  000.167  000.167: require('lazy.terminal')
+022.550  000.471  000.165: require('lazy.manage.task')
+022.553  000.809  000.121: require('lazy.manage.runner')
+022.557  000.956  000.147: require('lazy.manage')
+022.560  001.132  000.176: require('lazy.view.commands')
+022.701  000.123  000.123: require('lazy.core.fragments')
+024.838  000.077  000.077: require('custom.neotest-runner')
+025.925  000.758  000.758: require('snacks')
+026.027  000.098  000.098: require('custom.user_secrets')
+026.116  000.085  000.085: require('custom.dotnet-runner')
+026.267  000.148  000.148: require('custom.terminals')
+026.401  000.131  000.131: require('custom.stateful-snacks-explorer')
+027.096  000.159  000.159: require('lazy.core.handler.event')
+027.223  000.121  000.121: require('lazy.core.handler.keys')
+027.356  000.109  000.109: require('lazy.core.handler.ft')
+027.470  000.108  000.108: require('lazy.core.handler.cmd')
+027.507  000.005  000.005: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+027.535  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+033.141  000.004  000.004: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+033.185  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+033.820  000.085  000.085: sourcing nvim_exec2() called at C:\Program Files\Neovim\share/nvim/runtime/filetype.lua:0
+033.826  000.252  000.167: sourcing C:\Program Files\Neovim\share/nvim/runtime/filetype.lua
+033.837  000.424  000.172: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+034.097  000.221  000.221: require('custom.csharp-filetypes')
+035.275  001.173  001.173: require('vim.filetype')
+035.890  000.086  000.086: sourcing C:/Users/rmcfa/AppData/Local/nvim-data/lazy/snacks.nvim/plugin/snacks.lua
+035.902  000.195  000.109: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+035.910  000.003  000.003: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+035.933  000.001  000.001: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+037.092  000.209  000.209: require('vim.lsp.log')
+037.578  000.481  000.481: require('vim.lsp.protocol')
+037.873  000.288  000.288: require('vim.lsp.util')
+038.296  000.198  000.198: require('vim.lsp.sync')
+038.319  000.441  000.242: require('vim.lsp._changetracking')
+038.810  000.309  000.309: require('vim.lsp._transport')
+038.846  000.524  000.214: require('vim.lsp.rpc')
+038.878  002.210  000.268: require('vim.lsp')
+039.315  000.079  000.079: require('vim.treesitter.language')
+039.446  000.126  000.126: require('vim.func')
+039.555  000.104  000.104: require('vim.func._memoize')
+039.574  000.436  000.128: require('vim.treesitter.query')
+039.683  000.107  000.107: require('vim.treesitter._range')
+039.694  000.681  000.138: require('vim.treesitter.languagetree')
+039.698  000.812  000.131: require('vim.treesitter')
+039.738  003.183  000.161: sourcing C:/Users/rmcfa/AppData/Local/nvim-data/lazy/roslyn.nvim/plugin/roslyn.lua
+039.750  003.289  000.106: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+039.851  000.089  000.089: require('custom.roslyn-refresh')
+040.782  000.052  000.052: sourcing C:/Users/rmcfa/AppData/Local/nvim-data/lazy/nvim-web-devicons/plugin/nvim-web-devicons.vim
+040.793  000.152  000.100: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+040.800  000.001  000.001: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+040.821  000.001  000.001: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+041.232  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+041.257  000.001  000.001: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+041.291  000.001  000.001: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+041.306  000.001  000.001: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+042.119  000.150  000.150: require('lualine_require')
+042.664  001.304  001.154: require('lualine')
+042.795  000.009  000.009: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+043.672  000.009  000.009: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+044.202  000.007  000.007: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+044.241  000.004  000.004: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+044.322  000.003  000.003: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+044.341  000.003  000.003: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+044.358  000.003  000.003: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+044.378  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+044.403  000.009  000.009: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+044.426  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+044.443  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+044.457  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+044.472  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+044.492  000.007  000.007: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+044.509  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+044.520  000.008  000.008: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+046.395  000.010  000.010: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+046.420  000.003  000.003: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+046.437  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+046.639  000.005  000.005: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+046.658  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+046.674  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+046.689  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+046.707  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+046.721  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+046.737  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+046.751  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+046.765  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+046.781  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+046.795  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+046.814  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+046.829  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+046.844  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+046.858  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+046.873  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+046.887  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+046.902  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+046.934  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+046.950  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+046.967  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+046.981  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+047.010  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+047.025  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+047.040  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+051.686  000.696  000.696: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+051.706  000.007  000.007: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+052.201  000.009  000.009: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+052.223  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+052.239  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+052.254  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+052.281  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+052.296  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+052.330  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+052.347  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+052.363  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+052.382  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+052.399  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+052.415  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+052.431  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+052.453  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+052.472  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+052.487  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+052.502  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+052.516  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+052.531  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+052.546  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+052.573  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+053.048  000.126  000.126: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+053.060  000.003  000.003: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+053.141  000.077  000.077: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+053.148  000.004  000.004: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+053.705  000.132  000.132: require('lualine.utils.mode')
+054.380  000.099  000.099: require('lazy.status')
+054.688  000.010  000.010: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+054.817  000.102  000.102: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+054.837  000.015  000.015: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+054.845  000.004  000.004: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+054.852  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+056.618  000.104  000.104: require('nvim-treesitter.utils')
+057.609  000.986  000.986: require('nvim-treesitter.parsers')
+058.217  000.123  000.123: require('nvim-treesitter.compat')
+058.438  000.117  000.117: require('nvim-treesitter.ts_utils')
+058.446  000.224  000.106: require('nvim-treesitter.tsrange')
+058.557  000.109  000.109: require('nvim-treesitter.caching')
+058.568  000.631  000.174: require('nvim-treesitter.query')
+058.580  000.799  000.169: require('nvim-treesitter.configs')
+058.584  000.969  000.170: require('nvim-treesitter.info')
+058.701  000.115  000.115: require('nvim-treesitter.shell_command_selectors')
+058.723  002.344  000.169: require('nvim-treesitter.install')
+058.830  000.104  000.104: require('nvim-treesitter.statusline')
+058.938  000.104  000.104: require('nvim-treesitter.query_predicates')
+058.942  003.251  000.698: require('nvim-treesitter')
+059.136  000.189  000.189: require('vim.iter')
+059.505  003.904  000.465: sourcing C:/Users/rmcfa/AppData/Local/nvim-data/lazy/nvim-treesitter/plugin/nvim-treesitter.lua
+059.525  004.015  000.111: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+059.533  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+059.565  000.001  000.001: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+065.658  000.137  000.137: require('nvim-treesitter.highlight')
+065.773  000.004  000.004: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+065.794  000.002  000.002: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+066.771  000.588  000.588: require('render-markdown.settings')
+066.790  000.728  000.140: require('render-markdown')
+067.021  000.226  000.226: require('render-markdown.lib.presets')
+067.226  000.157  000.157: require('render-markdown.lib.compat')
+067.443  000.085  000.085: require('render-markdown.lib.list')
+067.449  000.218  000.134: require('render-markdown.lib.env')
+067.756  000.070  000.070: require('render-markdown.lib.interval')
+067.831  000.071  000.071: require('render-markdown.lib.str')
+067.835  000.222  000.080: require('render-markdown.lib.line')
+067.957  000.077  000.077: require('render-markdown.lib.resolved')
+068.030  000.070  000.070: require('render-markdown.lib.iter')
+068.033  000.498  000.129: require('render-markdown.lib.config')
+068.036  000.583  000.085: require('render-markdown.state')
+068.112  000.073  000.073: require('render-markdown.core.ts')
+068.269  000.073  000.073: require('render-markdown.request.context')
+068.352  000.080  000.080: require('render-markdown.core.log')
+068.358  000.242  000.090: require('render-markdown.core.ui')
+068.446  000.079  000.079: require('render-markdown.core.colors')
+068.739  000.077  000.077: require('render-markdown.api')
+068.745  000.189  000.113: require('render-markdown.core.command')
+068.873  000.091  000.091: require('render-markdown.core.manager')
+068.916  002.948  000.361: sourcing C:/Users/rmcfa/AppData/Local/nvim-data/lazy/render-markdown.nvim/plugin/render-markdown.lua
+068.928  003.059  000.112: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+068.937  000.003  000.003: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+068.962  000.001  000.001: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+069.698  000.072  000.072: sourcing C:/Users/rmcfa/AppData/Local/nvim-data/lazy/transparent.nvim/plugin/transparent.vim
+069.707  000.169  000.097: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+069.719  000.001  000.001: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+069.740  000.001  000.001: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+070.496  000.091  000.091: require('transparent.config')
+070.593  000.092  000.092: require('transparent.cache')
+070.854  001.111  000.928: require('transparent')
+071.749  000.099  000.099: sourcing C:/Users/rmcfa/AppData/Local/nvim-data/lazy/mason-tool-installer.nvim/plugin/mason-tool-installer.lua
+071.759  000.222  000.123: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+071.767  000.003  000.003: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+071.787  000.001  000.001: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+071.807  000.001  000.001: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+071.821  000.001  000.001: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+072.998  000.088  000.088: require('mason-core.path')
+073.259  000.070  000.070: require('mason-core.functional.data')
+073.340  000.076  000.076: require('mason-core.functional.function')
+073.430  000.085  000.085: require('mason-core.functional.list')
+073.536  000.081  000.081: require('mason-core.functional.relation')
+073.612  000.072  000.072: require('mason-core.functional.logic')
+073.751  000.135  000.135: require('mason-core.functional.number')
+073.832  000.075  000.075: require('mason-core.functional.string')
+073.907  000.071  000.071: require('mason-core.functional.table')
+073.981  000.070  000.070: require('mason-core.functional.type')
+073.984  000.893  000.159: require('mason-core.functional')
+074.047  001.043  000.150: require('mason-core.platform')
+074.142  000.093  000.093: require('mason.settings')
+074.146  001.337  000.114: require('mason-core.installer.InstallLocation')
+074.452  000.091  000.091: require('mason-core.log')
+074.456  000.171  000.080: require('mason-core.EventEmitter')
+074.570  000.112  000.112: require('mason-registry.sources')
+074.575  000.426  000.143: require('mason-registry')
+074.577  002.657  000.894: require('mason')
+074.841  000.084  000.084: require('mason.version')
+074.851  000.272  000.188: require('mason-tool-installer')
+075.128  000.077  000.077: require('mason-core.result')
+075.333  000.128  000.128: require('mason-core.async')
+075.427  000.090  000.090: require('mason-core.async.uv')
+075.629  000.124  000.124: require('mason-core.process')
+075.773  000.141  000.141: require('mason-core.spawn')
+075.780  000.350  000.085: require('mason-core.installer.managers.powershell')
+075.783  000.651  000.084: require('mason-core.fetch')
+075.901  000.116  000.116: require('mason-core.fs')
+076.002  000.098  000.098: require('mason-core.providers')
+076.162  000.079  000.079: require('mason-core.optional')
+076.567  000.158  000.158: require('mason-core.purl')
+076.659  000.086  000.086: require('mason-core.async.control')
+076.664  000.351  000.107: require('mason-core.package.AbstractPackage')
+077.032  000.091  000.091: require('mason-core.installer.compiler.expr')
+077.039  000.198  000.107: require('mason-core.installer.compiler.link')
+077.481  000.077  000.077: require('mason-core.installer.context.InstallContextCwd')
+077.570  000.084  000.084: require('mason-core.installer.context.InstallContextFs')
+077.647  000.075  000.075: require('mason-core.installer.context.InstallContextSpawn')
+077.734  000.083  000.083: require('mason-core.receipt')
+077.752  000.448  000.130: require('mason-core.installer.context')
+077.755  000.542  000.094: require('mason-core.installer')
+077.764  000.645  000.103: require('mason-core.installer.managers.std')
+077.767  000.725  000.080: require('mason-core.installer.compiler.schemas')
+077.850  000.082  000.082: require('mason-core.installer.compiler.util')
+077.870  001.123  000.118: require('mason-core.installer.compiler')
+077.971  000.098  000.098: require('mason-core.installer.linker')
+077.976  001.310  000.089: require('mason-core.installer.InstallRunner')
+078.071  000.092  000.092: require('mason-core.installer.UninstallRunner')
+078.077  001.901  000.147: require('mason-core.package')
+078.079  002.074  000.095: require('mason-registry.sources.util')
+078.085  003.145  000.129: require('mason-registry.sources.github')
+078.282  000.125  000.125: require('mason.api.command')
+079.431  007.606  001.406: require('config.mason-config')
+079.530  000.004  000.004: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+079.549  000.001  000.001: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+080.373  000.102  000.102: require('actions-preview.backend')
+080.515  000.138  000.138: require('actions-preview.config')
+080.638  000.119  000.119: require('actions-preview.action')
+080.643  001.091  000.732: require('actions-preview')
+080.973  000.095  000.095: sourcing C:\Program Files\Neovim\share/nvim/runtime/plugin/editorconfig.lua
+080.985  000.200  000.105: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+081.217  000.128  000.128: sourcing C:\Program Files\Neovim\share/nvim/runtime/plugin/gzip.vim
+081.225  000.226  000.099: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+081.433  000.097  000.097: sourcing C:\Program Files\Neovim\share/nvim/runtime/plugin/man.lua
+081.443  000.211  000.114: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+082.363  000.024  000.024: require('vim.F')
+082.745  000.161  000.161: sourcing C:\Program Files\Neovim\share\nvim\runtime\pack\dist\opt\matchit\plugin\matchit.vim
+082.778  001.235  001.051: sourcing C:\Program Files\Neovim\share/nvim/runtime/plugin/matchit.vim
+082.784  001.335  000.100: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+083.000  000.117  000.117: sourcing C:\Program Files\Neovim\share/nvim/runtime/plugin/matchparen.vim
+083.009  000.217  000.100: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+084.362  000.218  000.218: sourcing C:\Program Files\Neovim\share\nvim\runtime\pack\dist\opt\netrw\plugin\netrwPlugin.vim
+084.398  001.283  001.065: sourcing C:\Program Files\Neovim\share/nvim/runtime/plugin/netrwPlugin.vim
+084.404  001.389  000.106: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+084.631  000.098  000.098: sourcing C:\Program Files\Neovim\share/nvim/runtime/plugin/osc52.lua
+084.641  000.228  000.131: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+085.028  000.286  000.286: sourcing C:\Program Files\Neovim\share/nvim/runtime/plugin/rplugin.vim
+085.081  000.434  000.148: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+085.252  000.053  000.053: sourcing C:\Program Files\Neovim\share/nvim/runtime/plugin/shada.vim
+085.260  000.170  000.117: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+085.390  000.025  000.025: sourcing C:\Program Files\Neovim\share/nvim/runtime/plugin/spellfile.vim
+085.397  000.130  000.105: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+085.563  000.065  000.065: sourcing C:\Program Files\Neovim\share/nvim/runtime/plugin/tarPlugin.vim
+085.570  000.169  000.103: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+085.766  000.090  000.090: sourcing C:\Program Files\Neovim\share/nvim/runtime/plugin/tohtml.lua
+085.775  000.200  000.110: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+085.916  000.028  000.028: sourcing C:\Program Files\Neovim\share/nvim/runtime/plugin/tutor.vim
+085.922  000.135  000.107: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+086.117  000.088  000.088: sourcing C:\Program Files\Neovim\share/nvim/runtime/plugin/zipPlugin.vim
+086.124  000.192  000.104: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+086.324  068.297  031.621: require('config.lazy')
+086.577  000.007  000.007: sourcing nvim_exec2() called at C:\Users\rmcfa\AppData\Local\nvim\init.lua:0
+086.617  000.289  000.283: require('config.options')
+086.863  000.118  000.118: require('custom.line_numbers')
+086.962  000.095  000.095: require('snacks.keymap')
+088.847  000.210  000.210: require('vim.lsp.buf')
+088.906  002.286  001.864: require('config.keymaps')
+089.074  000.165  000.165: require('config.highlights')
+089.448  000.159  000.159: require('config.autocmds')
+089.453  071.480  000.283: sourcing C:\Users\rmcfa\AppData\Local\nvim\init.lua
+089.482  001.088: sourcing vimrc file(s)
+090.598  000.084  000.084: sourcing C:\Program Files\Neovim\share\nvim\runtime\filetype.lua
+091.333  000.064  000.064: sourcing C:\Program Files\Neovim\share\nvim\runtime\syntax\synload.vim
+091.635  000.702  000.638: sourcing C:\Program Files\Neovim\share/nvim/runtime/syntax/syntax.vim
+091.653  001.385: inits 3
+093.680  002.026: reading ShaDa
+093.885  000.206: opening buffers
+094.161  000.194  000.194: require('snacks.explorer')
+094.502  000.422: BufEnter autocommands
+094.507  000.005: editing files in windows
+094.513  000.007: --- NVIM STARTED ---
+

@@ -30,6 +30,7 @@ mason_tool_installer.setup({
     "pyright",
     "basedpyright",
     "ruff",
+    "powershell-editor-services",
     "black",
     "isort",
     "rust-analyzer",

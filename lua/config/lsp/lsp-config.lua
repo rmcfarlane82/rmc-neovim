@@ -17,6 +17,7 @@ local server_modules = {
 	"config.lsp.roslyn",
 	"config.lsp.python",
 	"config.lsp.lua_ls",
+	"config.lsp.powershell",
 }
 
 for _, module in ipairs(server_modules) do
@@ -47,6 +48,7 @@ local servers = vim.list_extend(vim.deepcopy(default_servers), {
 	"basedpyright",
 	"ruff",
 	"lua_ls",
+	"powershell_es",
 })
 vim.lsp.enable(servers)
 

@@ -103,9 +103,9 @@ local function apply()
 	-- Extra groups (what used to be base46.hl_add)
 	---------------------------------------------------------------------------
 	local extra = {
-	--	SnacksTerminal                         = { bg = "none" },
+		SnacksTerminal                         = { bg = "#1e1e1e" },
 	--	SnacksTerminalBorder                   = { bg = "none" },
-		NormalFloat                            = { bg = "none" },
+		NormalFloat                            = { bg = "#1e1e1e" },
 	--	FloatBorder                            = { bg = "none" },
 	--	Terminal                               = { bg = "none" },
 	--Normal = { bg = "#1e1e1e" },

@@ -44,6 +44,14 @@ return {
     end,
   },
   {
+    "MeanderingProgrammer/render-markdown.nvim",
+    opts = {
+      code = {
+        border = "thin",
+      },
+    },
+  },
+  {
     "neovim/nvim-lspconfig",
     opts = {
       diagnostics = {

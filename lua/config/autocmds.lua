@@ -7,6 +7,30 @@
 -- Or remove existing autocmds by their group name (which is prefixed with `lazyvim_` for the defaults)
 -- e.g. vim.api.nvim_del_augroup_by_name("lazyvim_wrap_spell")
 ---- Make floating windows transparent (and keep it after :colorscheme changes)
+local function apply_markdown_highlights()
+  local groups = {
+    "RenderMarkdownCode",
+    "RenderMarkdownCodeInline",
+    "RenderMarkdownH1Bg",
+    "RenderMarkdownH2Bg",
+    "RenderMarkdownH3Bg",
+    "RenderMarkdownH4Bg",
+    "RenderMarkdownH5Bg",
+    "RenderMarkdownH6Bg",
+  }
+  for _, group in ipairs(groups) do
+    local ok, hl = pcall(vim.api.nvim_get_hl, 0, { name = group, link = false })
+    if ok then
+      hl.bg = nil
+      vim.api.nvim_set_hl(0, group, hl)
+    end
+  end
+end
+
+local function apply_highlights()
+  vim.api.nvim_set_hl(0, "Visual", { bg = "#89b4fa", fg = "#1e1e2e" })
+end
+
 local function apply_transparency()
   -- Core UI
   -- vim.api.nvim_set_hl(0, "Normal", { bg = "NONE" })
@@ -49,9 +73,15 @@ local function apply_transparency()
 end
 
 apply_transparency()
+apply_markdown_highlights()
+apply_highlights()
 
 vim.opt.spell = true
 
 vim.api.nvim_create_autocmd("ColorScheme", {
-  callback = apply_transparency,
+  callback = function()
+    apply_transparency()
+    apply_markdown_highlights()
+    apply_highlights()
+  end,
 })

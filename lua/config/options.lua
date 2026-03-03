@@ -3,3 +3,12 @@
 -- Add any additional options here
 --
 vim.api.nvim_command("hi Normal guibg=none ctermbg=none")
+
+vim.diagnostic.config({
+  float = { border = "rounded" },
+})
+
+vim.opt.spelllang = "en_gb"
+
+vim.opt.guicursor =
+  "n-v:block-Cursor,i-c-ci-ve:ver25-iCursor-blinkwait0-blinkoff1-blinkon1,r-cr-o:hor20-rCursor,t:ver25-iCursor-blinkwait0-blinkoff1-blinkon1"

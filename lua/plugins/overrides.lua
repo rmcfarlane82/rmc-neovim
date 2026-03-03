@@ -37,7 +37,7 @@ return {
       opts.dashboard.preset.keys = opts.dashboard.preset.keys or {}
       table.insert(opts.dashboard.preset.keys, {
         key = "m",
-        icon = " ",
+        icon = "",
         desc = "Mason",
         action = ":Mason",
       })
@@ -62,6 +62,17 @@ return {
   {
     "folke/noice.nvim",
     opts = {
+      lsp = {
+        signature = {
+          enabled = false,
+          auto_open = {
+            enabled = false,
+          },
+        },
+        hover = {
+          enabled = false,
+        },
+      },
       views = {
         hover = {
           border = {
@@ -85,5 +96,4 @@ return {
       require("better_escape").setup()
     end,
   },
-
 }

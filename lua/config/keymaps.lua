@@ -26,6 +26,21 @@ vim.keymap.set("n", "K", function()
   vim.lsp.buf.hover({ border = "rounded" })
 end, { desc = "Hover" })
 
+vim.keymap.set("n", "<Esc>", function()
+  local closed = false
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    local cfg = vim.api.nvim_win_get_config(win)
+    if cfg.relative ~= "" then
+      pcall(vim.api.nvim_win_close, win, true)
+      closed = true
+    end
+  end
+  if closed then
+    return
+  end
+  vim.cmd("nohlsearch")
+end, { desc = "Close floating windows" })
+
 Snacks.toggle({
   name = "Virtual Text",
   get = function()
@@ -35,3 +50,13 @@ Snacks.toggle({
     vim.diagnostic.config({ virtual_text = state })
   end,
 }):map("<leader>uv")
+
+Snacks.toggle({
+  name = "Typewriter Mode",
+  get = function()
+    return vim.o.scrolloff >= 999
+  end,
+  set = function(state)
+    vim.o.scrolloff = state and 999 or 4
+  end,
+}):map("<leader>ut")

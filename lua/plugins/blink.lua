@@ -28,54 +28,42 @@ local kind_icons = {
 return {
   "saghen/blink.cmp",
   opts = {
-    keymap = {
-      preset = "none",
-      ["<C-j>"] = { "select_next", "fallback" },
-      ["<C-k>"] = { "select_prev", "fallback" },
-      ["<CR>"] = { "accept", "fallback" },
-    },
-    snippets = {
-      preset = "default",
-    },
+    -- keymap = {
+    --   preset = "none",
+    --   ["<C-j>"] = { "select_next", "fallback" },
+    --   ["<C-k>"] = { "select_prev", "fallback" },
+    --   ["<CR>"] = { "accept", "fallback" },
+    -- },
+    -- snippets = {
+    --   preset = "default",
+    -- },
     appearance = { use_nvim_cmp_as_default = false },
-    signature = {
-      enabled = true,
-      window = {
-        border = "rounded",
-        max_width = 200,
-        scrollbar = false,
-      },
-    },
-    cmdline = {
-      sources = {},
-    },
-    sources = {
-      default = { "lsp", "path", "snippets", "buffer" },
-      per_filetype = {
-        cs = { "lsp", "snippets", "buffer" },
-      },
-    },
+    -- cmdline = {
+    --   sources = {},
+    -- },
+    -- sources = {
+    --   default = { "lsp", "path", "snippets", "buffer" },
+    --   per_filetype = {
+    --     cs = { "lsp", "snippets", "buffer" },
+    --   },
+    -- },
     completion = {
-      trigger = {
-        show_on_blocked_trigger_characters = { "(" },
-      },
-      list = {
-        selection = {
-          preselect = true,
-        },
-      },
+      --   trigger = {
+      --     show_on_blocked_trigger_characters = { "(" },
+      --   },
+      --   list = {
+      --     selection = {
+      --       preselect = true,
+      --     },
+      --   },
       documentation = {
-        auto_show = true,
-        auto_show_delay_ms = 150,
         window = {
           border = "rounded",
-          max_width = 80,
-          max_height = 40,
         },
       },
       menu = {
+        border = "rounded",
         draw = {
-          treesitter = { "lsp" },
           columns = {
             { "kind_icon" },
             { "label", "label_description", gap = 1 },
@@ -108,14 +96,6 @@ return {
               end,
             },
           },
-        },
-      },
-      ghost_text = {
-        enabled = true,
-      },
-      accept = {
-        auto_brackets = {
-          enabled = true,
         },
       },
     },

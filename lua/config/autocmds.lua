@@ -85,3 +85,19 @@ vim.api.nvim_create_autocmd("ColorScheme", {
     apply_highlights()
   end,
 })
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "markdown",
+  callback = function(args)
+    if vim.bo[args.buf].buftype ~= "nofile" then
+      return
+    end
+    local ok, cfg = pcall(vim.api.nvim_win_get_config, 0)
+    if not ok or cfg.relative == "" then
+      return
+    end
+    vim.keymap.set("n", "<Esc>", function()
+      pcall(vim.api.nvim_win_close, 0, true)
+    end, { buffer = args.buf, silent = true })
+  end,
+})

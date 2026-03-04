@@ -28,34 +28,8 @@ local kind_icons = {
 return {
   "saghen/blink.cmp",
   opts = {
-    -- keymap = {
-    --   preset = "none",
-    --   ["<C-j>"] = { "select_next", "fallback" },
-    --   ["<C-k>"] = { "select_prev", "fallback" },
-    --   ["<CR>"] = { "accept", "fallback" },
-    -- },
-    -- snippets = {
-    --   preset = "default",
-    -- },
     appearance = { use_nvim_cmp_as_default = false },
-    -- cmdline = {
-    --   sources = {},
-    -- },
-    -- sources = {
-    --   default = { "lsp", "path", "snippets", "buffer" },
-    --   per_filetype = {
-    --     cs = { "lsp", "snippets", "buffer" },
-    --   },
-    -- },
     completion = {
-      --   trigger = {
-      --     show_on_blocked_trigger_characters = { "(" },
-      --   },
-      --   list = {
-      --     selection = {
-      --       preselect = true,
-      --     },
-      --   },
       documentation = {
         window = {
           border = "rounded",

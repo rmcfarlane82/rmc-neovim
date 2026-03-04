@@ -1,5 +1,4 @@
 return {
-
   {
     "folke/snacks.nvim",
     opts = function(_, opts)
@@ -41,6 +40,41 @@ return {
         desc = "Mason",
         action = ":Mason",
       })
+
+      local img = vim.fs.normalize(vim.fs.joinpath(vim.fn.stdpath("config"), "screenshots", "nvim-vs-code.png"))
+      opts.dashboard.sections = {
+        { section = "header" },
+        { section = "keys", gap = 1, padding = 1 },
+        { section = "startup" },
+        {
+          section = "terminal",
+          pane = 2,
+          padding = 1,
+          cmd = "ipconfig",
+          height = 8,
+          gap = 1,
+        },
+        {
+          section = "terminal",
+          pane = 2,
+          align = "center",
+          cmd = {
+            "chafa",
+            img,
+            "--format",
+            "symbols",
+            "--size",
+            "60x22",
+            "--stretch",
+            "-w",
+            "9",
+            "--dither",
+            "ordered",
+          },
+          height = 21,
+          padding = 1,
+        },
+      }
     end,
   },
   {
@@ -89,11 +123,5 @@ return {
         border = "rounded",
       },
     },
-  },
-  {
-    "max397574/better-escape.nvim",
-    config = function()
-      require("better_escape").setup()
-    end,
   },
 }

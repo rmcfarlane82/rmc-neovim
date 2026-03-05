@@ -4,12 +4,14 @@ return {
   {
     "mason-org/mason.nvim",
     opts = function(_, opts)
-      opts.registries = {
-        "github:mason-org/mason-registry",
-        "github:Crashdummyy/mason-registry",
-      }
-      opts.ensure_installed = opts.ensure_installed or {}
-      vim.list_extend(opts.ensure_installed, { "csharpier", "netcoredbg", "fantomas" })
+      opts = vim.tbl_deep_extend("force", opts or {}, {
+        registries = {
+          "github:mason-org/mason-registry",
+          "github:Crashdummyy/mason-registry",
+        },
+      })
+      opts.ensure_installed = vim.list_extend(opts.ensure_installed or {}, { "netcoredbg", "fantomas" })
+      return opts
     end,
   },
 
@@ -32,7 +34,7 @@ return {
     optional = true,
     opts = {
       formatters_by_ft = {
-        cs = { "csharpier" },
+        cs = { "lsp" },
         fsharp = { "fantomas" },
       },
     },

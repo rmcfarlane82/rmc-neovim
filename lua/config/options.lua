@@ -16,4 +16,4 @@ vim.opt.relativenumber = false
 
 vim.opt.guicursor = "n-v:block-Cursor,i-c-ci-ve:ver25-iCursor-blinkwait0-blinkoff1-blinkon1,r-cr-o:hor20-rCursor,t:ver25-iCursor-blinkwait0-blinkoff1-blinkon1"
 vim.opt.startofline = false
-vim.opt.spell = true
+vim.opt.spell = false

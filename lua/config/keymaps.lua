@@ -1,6 +1,7 @@
 -- Keymaps are automatically loaded on the VeryLazy event
 -- Default keymaps that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
 -- Add any additional keymaps here
+local Snacks = require("snacks")
 
 vim.keymap.set("n", "<C-e>", function()
   require("snacks").explorer()
@@ -17,8 +18,6 @@ vim.keymap.set("n", "<C-M-h>", ":vertical resize -2<CR>", { silent = true })
 vim.keymap.set("n", "<C-M-l>", ":vertical resize +2<CR>", { silent = true })
 vim.keymap.set("n", "<C-M-k>", ":resize +2<CR>", { silent = true })
 vim.keymap.set("n", "<C-M-j>", ":resize -2<CR>", { silent = true })
-vim.keymap.set("n", "j", "+")
-vim.keymap.set("n", "k", "-")
 
 vim.keymap.set("n", "K", function()
   vim.lsp.buf.hover({ border = "rounded" })

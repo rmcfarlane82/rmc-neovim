@@ -1,3 +1,5 @@
+local explorer_width = 40
+
 return {
   {
     "folke/snacks.nvim",
@@ -21,6 +23,8 @@ return {
             files = { layout = { preset = "ivy" } },
             grep = { layout = { preset = "ivy" } },
             explorer = {
+              hidden = true,
+              ignored = true,
               win = {
                 input = {
                   keys = {
@@ -28,9 +32,21 @@ return {
                   },
                 },
               },
+              on_close = function(picker)
+                local root = picker.layout and picker.layout.root
+                if root and root.win and vim.api.nvim_win_is_valid(root.win) then
+                  explorer_width = vim.api.nvim_win_get_width(root.win)
+                end
+              end,
               layout = {
                 preview = "main",
                 hidden = { "preview" },
+                layout = {
+                  width = function()
+                    return explorer_width
+                  end,
+                  min_width = 20,
+                },
               },
             },
           },

@@ -14,6 +14,7 @@ return {
   },
   ---@type oklch.Opts
   opts = {
+    wsl_use_windows_app = false,
     highlight = {
       -- Options: 'background'|'foreground'|'virtual_left'|'virtual_eol'|'foreground+virtual_left'|'foreground+virtual_eol'
       style = "virtual_left",

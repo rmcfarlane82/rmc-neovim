@@ -29,6 +29,15 @@ local function apply_core_highlights()
   vim.api.nvim_set_hl(0, "DiffChange", { fg = "none", bg = "none" }) -- base + subtle tint
   vim.api.nvim_set_hl(0, "DiffText", { fg = "#cdd6f4", bg = "#694559", bold = true }) -- minus-emph-style
 
+  -- Lualine normal mode color
+  vim.schedule(function()
+    vim.api.nvim_set_hl(0, "lualine_a_normal", { fg = "#1a1a1a", bg = "#E5E510" })
+  end)
+
+  -- Cursor colors: yellow in normal mode, green in insert
+  vim.api.nvim_set_hl(0, "Cursor",  { fg = "#1a1a1a", bg = "#E5E510" })
+  vim.api.nvim_set_hl(0, "iCursor", { fg = "#1a1a1a", bg = "#ffffff" })
+
   -- Optional: Line number colors
   vim.api.nvim_set_hl(0, "LineNr", { fg = "#6c7086" })
   vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#a6adc8", bold = true })
